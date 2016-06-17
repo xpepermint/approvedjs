@@ -6,6 +6,8 @@ Approved.js provides methods for synchronous and asynchronous validation of comp
 
 It is an open source package. The [source code](https://github.com/xpepermint/approvedjs) is available on GitHub where you can also find our [issue tracker](https://github.com/xpepermint/approvedjs/issues).
 
+<img src="giphy.gif" width="300" />
+
 ## Motivation
 
 We often write code which validates input data and handles errors. We do it when we write API controllers, GraphQL mutations, before we try to write something into a database and in many other cases related to data manipulation and data mutation.
