@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An elegant and intuitive way of synchronous and asynchronous data validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
@@ -36,7 +36,8 @@
   "homepage": "https://github.com/xpepermint/approvedjs#readme",
   "dependencies": {
     "dottie": "^1.1.1",
-    "es6-error": "^3.0.0"
+    "es6-error": "^3.0.0",
+    "validator": "^5.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
