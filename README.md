@@ -61,7 +61,7 @@ export const handlers = [
 ];
 ```
 
-**Step 2:** Write approved code block.
+**Step 2:** Write approved code block (e.g. inside `./index.js`).
 
 ```js
 // importing approved methods
@@ -85,7 +85,7 @@ let input = {
     // data manipulation goes here (e.g. write something to database)
     result = 'Input object is valid';
   } catch(err) {
-    // handling validation and other system errors
+    // handling validation (included by default) and other errors (defined in handlers)
     errors = await handleError(err, handlers);
     // raising unhandled errors
     if (!errors) throw err;
@@ -96,7 +96,3 @@ let input = {
 
 })().catch(console.error);
 ```
-
-## API
-
-TODO

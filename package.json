@@ -29,5 +29,9 @@
   "bugs": {
     "url": "https://github.com/xpepermint/approvedjs/issues"
   },
-  "homepage": "https://github.com/xpepermint/approvedjs#readme"
+  "homepage": "https://github.com/xpepermint/approvedjs#readme",
+  "dependencies": {
+    "dottie": "^1.1.1",
+    "es6-error": "^3.0.0"
+  }
 }
