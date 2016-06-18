@@ -41,10 +41,62 @@ async (ctx, next) => {
 
 This is only an example so don't try figuring out the logic. This is just to demonstrate how easy, clean and beautiful it is to write a controller which includes validation and error handling. Note that all errors, no matter the type, are in the same format. In case the validation fails or the database fails to save the document (e.g because the user already exists in the database), the server will respond with errors which are formatted in the same way.
 
-## Installation
+## Setup
 
-Install the package by running the command below.
+**Step 0:** Install the package by running the command below.
 
 ```
 $ npm install --save approved
 ```
+
+**Step 1:** Create a new file `./approvals/user.js` and add configuration.
+
+```js
+export const validations = [
+  {path: 'firstName', validator: 'isPresent', message: 'must be present'},
+  {path: 'firstName', validator: 'isLength', min: 2, max: 50, message: 'can be between 2 and 50'}
+];
+
+export const handlers = [
+];
+```
+
+**Step 2:** Write approved code block.
+
+```js
+// importing approved methods
+import {validateInput, handleError} from 'approved';
+// importing approval from step 1
+import {validations, handlers} from './approvals/user';
+
+// defining sample data object
+let input = {
+  firstName: 'John',
+  lastName: 'Smith'
+};
+
+// starting main code block
+(async function() {
+  let result, errors = null;
+
+  try {
+    // validate input data
+    await validateInput(input, validations);
+    // data manipulation goes here (e.g. write something to database)
+    result = 'Input object is valid';
+  } catch(err) {
+    // handling validation and other system errors
+    errors = await handleError(err, handlers);
+    // raising unhandled errors
+    if (!errors) throw err;
+  }
+
+  // display result/errors
+  console.log({result, errors});
+
+})().catch(console.error);
+```
+
+## API
+
+TODO
