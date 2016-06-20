@@ -226,9 +226,69 @@ let validation = {
 };
 ```
 
-##### isAbsence
+##### isAbsent
 
 > Validates that the specified attribute is blank.
+
+##### isAlpha
+
+-> TODO
+
+##### isAlphanumeric
+
+-> TODO
+
+##### isAscii
+
+-> TODO
+
+##### isBase64
+
+-> TODO
+
+##### isCreditCard
+
+-> TODO
+
+##### isDataURI
+
+-> TODO
+
+##### isDate
+
+-> TODO
+
+##### isEmail
+
+-> TODO
+
+##### isFQDN
+
+-> TODO
+
+##### isHexColor
+
+-> TODO
+
+##### isIP
+
+-> TODO
+
+##### isISBN
+
+-> TODO
+
+##### isISIN
+
+-> TODO
+
+##### isIn
+
+-> TODO
+
+##### isJSON
+
+-> TODO
 
 ##### isLength
 
@@ -247,10 +307,37 @@ let validation = {
   message: 'must be between 5 and 10 long'
 };
 ```
+##### isLowercase
+
+-> TODO
+
+##### isMACAddress
+
+-> TODO
+
+##### isMobilePhone
+
+-> TODO
+
+##### isMongoId
+
+-> TODO
 
 ##### isPresent
 
 > Validates that the specified attribute is not blank.
+
+##### isURL
+
+-> TODO
+
+##### isUUID
+
+-> TODO
+
+##### isUppercase
+
+-> TODO
 
 ##### isValid
 
@@ -268,6 +355,10 @@ let validation = {
   message: 'must be present'
 };
 ```
+
+##### matches
+
+-> TODO
 
 ### Handlers
 
