@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "An elegant and intuitive way of synchronous and asynchronous data validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "build": "babel src -d dist",
     "prepublish": "npm run build",
     "example": "babel-node ./example",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "npm run build",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,11 @@
     "exceptions",
     "framework"
   ],
+  "jest": {
+    "testPathDirs": ["dist"],
+    "unmockedModulePathPatterns": ["./"],
+    "collectCoverage": true
+  },
   "author": "xpepermint (Kristijan Sedlak)",
   "license": "MIT",
   "bugs": {
@@ -43,6 +49,7 @@
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-preset-node5": "^11.1.0",
+    "jest-cli": "^12.1.1",
     "koa": "^2.0.0",
     "koa-bodyparser": "^3.1.0"
   }
