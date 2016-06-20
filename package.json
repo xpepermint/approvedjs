@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "An elegant and intuitive way of synchronous and asynchronous data validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "prebuild": "npm run clean; mkdir -p dist",
     "build": "babel src -d dist",
     "prepublish": "npm run build",
+    "example": "babel-node ./example",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -41,6 +42,8 @@
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
-    "babel-preset-node5": "^11.1.0"
+    "babel-preset-node5": "^11.1.0",
+    "koa": "^2.0.0",
+    "koa-bodyparser": "^3.1.0"
   }
 }
