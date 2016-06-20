@@ -14,6 +14,7 @@ describe('isLength', () => {
         options: {min: 3, max: 5},
         message: 'must be between 5 and 10'
       }]);
+      expect(false).toEqual(true);
     } catch(err) {
       expect(err.errors).toEqual([{path: 'name', message: 'must be between 5 and 10'}]);
     }

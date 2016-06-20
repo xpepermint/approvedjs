@@ -209,9 +209,22 @@ let validation = {
 
 #### Built-in Validators
 
-##### isPresent
+##### contains
 
-> Validates that the specified attribute is not blank.
+> Checks if the string contains the seed.
+
+| Option | Type | Required | Description
+|--------|------|----------|------------
+| seed | String | Yes | The seed which should exist in the string.
+
+```js
+let validation = {
+  path: 'name',
+  validator: 'contains',
+  options: {seed: 'John'},
+  message: 'must contain the John word'
+};
+```
 
 ##### isAbsence
 
@@ -234,6 +247,10 @@ let validation = {
   message: 'must be between 5 and 10 long'
 };
 ```
+
+##### isPresent
+
+> Validates that the specified attribute is not blank.
 
 ##### isValid
 

@@ -21,6 +21,7 @@ describe('isAbsent', () => {
         validator: 'isAbsent',
         message: 'must be blank'
       }]);
+      expect(false).toEqual(true);
     } catch (err) {
       expect(err.errors).toEqual([{ path: 'name', message: 'must be blank' }]);
     }

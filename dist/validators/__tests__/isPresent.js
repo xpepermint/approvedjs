@@ -19,6 +19,7 @@ describe('isPresent', () => {
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(false).toEqual(true);
     } catch (err) {
       expect(err.errors).toEqual([{ path: 'name', message: 'must be present' }]);
     }
@@ -33,6 +34,7 @@ describe('isPresent', () => {
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(false).toEqual(true);
     } catch (err) {
       expect(err.errors).toEqual([{ path: 'name', message: 'must be present' }]);
     }
@@ -47,6 +49,7 @@ describe('isPresent', () => {
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(false).toEqual(true);
     } catch (err) {
       expect(err.errors).toEqual([{ path: 'name', message: 'must be present' }]);
     }

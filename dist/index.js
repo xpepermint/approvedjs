@@ -38,7 +38,8 @@ class Approval {
       isPresent: require('./validators/isPresent'),
       isAbsent: require('./validators/isAbsent'),
       isLength: require('./validators/isLength'),
-      isValid: require('./validators/isValid')
+      isValid: require('./validators/isValid'),
+      contains: require('./validators/contains')
     };
   }
 

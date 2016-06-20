@@ -10,21 +10,21 @@ const ValidationError = _require.ValidationError;
 
 let approval = new Approval();
 
-describe('isLength', () => {
+describe('contains', () => {
 
-  it('fails when string size is not in the min/max range', _asyncToGenerator(function* () {
+  it('fails when string does not contain the provided seed', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
-        name: 'John Smith'
+        description: 'my fake description'
       }, [{
-        path: 'name',
-        validator: 'isLength',
-        options: { min: 3, max: 5 },
-        message: 'must be between 5 and 10'
+        path: 'description',
+        validator: 'contains',
+        options: { seed: 'hello' },
+        message: 'must contain the `hello` word'
       }]);
       expect(false).toEqual(true);
     } catch (err) {
-      expect(err.errors).toEqual([{ path: 'name', message: 'must be between 5 and 10' }]);
+      expect(err.errors).toEqual([{ path: 'description', message: 'must contain the `hello` word' }]);
     }
   }));
 });
