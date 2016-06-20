@@ -58,6 +58,7 @@ export class Approval {
 
     let handler = null;
     for (let handlerCandidate of handlers) {
+      let handlerOptions = handlerCandidate.options || {};
 
       if (!( // name
         handlerCandidate.error === err.name
@@ -65,13 +66,13 @@ export class Approval {
       )) { continue }
 
       if (!( // code
-        typeof handlerCandidate.code === 'undefined'
-        || typeof handlerCandidate.code !== 'undefined' && handlerCandidate.code === err.code
+        typeof handlerOptions.code === 'undefined'
+        || typeof handlerOptions.code !== 'undefined' && handlerOptions.code === err.code
       )) { continue }
 
       if (!( // block
-        typeof handlerCandidate.block === 'undefined'
-        || typeof handlerCandidate.block !== 'undefined' && await handlerCandidate.block(err, options)
+        typeof handlerOptions.block === 'undefined'
+        || typeof handlerOptions.block !== 'undefined' && await handlerOptions.block(err, options)
       )) { continue }
 
       handler = handlerCandidate;

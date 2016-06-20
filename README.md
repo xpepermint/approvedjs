@@ -64,7 +64,7 @@ const validations = [
     path: 'firstName',
     validator: 'isPresent',
     message: 'must be present'
-  },{
+  }, {
     path: 'firstName',
     validator: 'isLength',
     options: {min: 2, max: 50},
@@ -90,8 +90,10 @@ const handlers = [
   {
     path: 'firstName',
     error: 'MongoError',
-    code: 11000,
-    block: async (err, options) => mongoParser(err).index === 'uniqueFirstName',
+    options: {
+      code: 11000,
+      block: async (err) => mongoParser(err).index === 'uniqueFirstName'
+    }
     message: 'is already taken'
   }
 ];
@@ -188,7 +190,7 @@ try {
 
 ### Validations
 
-Validation object defines how a value of an input object key should be validated.
+Validation object defines how a value of an input object key is validated by the `validateInput` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
@@ -248,4 +250,74 @@ let validation = {
   options: {block: async (value, options) => true},
   message: 'must be present'
 };
+```
+
+### Handlers
+
+Handler object defines how an error is handled by the `handleError` method.
+
+| Key | Type | Required | Description
+|-----|------|----------|------------
+| path | String | Yes | The output key name or a key name of an input object to which the error refers to.
+| error | Object | Yes | Error class instance.
+| options | Object | No | Handler options. You can set the `code` and `block` keys to additionally check if the handler applies to the provided error.
+| message | String | Yes | Output error message explaining what went wrong.
+
+```js
+let handler = {
+  path: 'system',
+  error: 'Error',
+  options {code: 500, block: async (value) => true},
+  message: 'something went wrong'
+};
+```
+
+## Advanced Usage
+
+You can completely customize how this module behaves by overriding the instance public methods or by defining your custom validators (check the source code for more).
+
+### Custom Validator
+
+All you need to do to create your custom validator is to define your custom method on the `approval.validators` object.
+
+```js
+import {Approval} from 'approved';
+
+let approval = new Approval();
+
+approval.validators.isCool = (value, options) => {
+  return str === 'cool';
+};
+
+validateInput({
+  word: 'cool'
+}, [{
+  path: 'word',
+  validator: 'isCool',
+  message: 'must be cool'
+}]);
+```
+
+## License (MIT)
+
+```
+Copyright (c) 2016 Kristijan Sedlak <xpepermint@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 ```

@@ -95,6 +95,7 @@ class Approval {
 
       let handler = null;
       for (let handlerCandidate of handlers) {
+        let handlerOptions = handlerCandidate.options || {};
 
         if (!( // name
         handlerCandidate.error === err.name || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error)) {
@@ -102,12 +103,12 @@ class Approval {
         }
 
         if (!( // code
-        typeof handlerCandidate.code === 'undefined' || typeof handlerCandidate.code !== 'undefined' && handlerCandidate.code === err.code)) {
+        typeof handlerOptions.code === 'undefined' || typeof handlerOptions.code !== 'undefined' && handlerOptions.code === err.code)) {
           continue;
         }
 
         if (!( // block
-        typeof handlerCandidate.block === 'undefined' || typeof handlerCandidate.block !== 'undefined' && (yield handlerCandidate.block(err, options)))) {
+        typeof handlerOptions.block === 'undefined' || typeof handlerOptions.block !== 'undefined' && (yield handlerOptions.block(err, options)))) {
           continue;
         }
 
