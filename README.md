@@ -28,9 +28,9 @@ Continue reading to see how this package is supposed to be used.
 
 ## Usage
 
-Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. The code validates an input and creates a new document in a database. If something goes wrong, we read an error and parse it into a user-friendly format.
+Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we will validate an input and create a new document in a database. If something will go wrong, an error will be catched and parsed into a user-friendly format.
 
-To make things as clean as possible, we'll use [Babel](https://babeljs.io/) with ES7 features and wrap our code into the `async` block.
+To make things as clean as possible, we'll use [Babel](https://babeljs.io/) with ES7 features and thus we will be able to wrap our code into the `async` block.
 
 ```js
 (async function() {
@@ -48,7 +48,15 @@ const input = {
 }
 ```
 
-Continue by defining a sequence of validations which verify the `firstName` field presence and length.
+Instantiate the main `Approval` class.
+
+```js
+import {Approval} from 'approved';
+
+let approval = new Approval();
+```
+
+Continue by defining a sequence of validations for the `firstName` field.
 
 ```js
 const validations = [
@@ -57,7 +65,7 @@ const validations = [
 ];
 ```
 
-To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) for storing data, with a unique index on the `firstName` field, named `uniqueFirstName`. This will trigger the `E11000` error when the code will be executed for the second time. Using the MongoDB driver and [creating unique indexes](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure this yourself.
+To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) for storing data, with a unique index on the `firstName` field, named `uniqueFirstName`. This will trigger the `E11000` error when the code will be executed for the second time. How to use the MongoDB driver and how to [create a unique indexe](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure this yourself.
 
 ```js
 import {MongoClient} from 'mongodb';
@@ -76,18 +84,14 @@ const handlers = [
 ]
 ```
 
-Next, import some Approved.js methods.
-
-```js
-import {validateInput, handleError} from 'approved';
-```
-
 Add a try/catch block which validates input data, saves data to the database and catches errors.
 
 ```js
+const {validateInput, handleError} = approval;
+
 let result, errors = null;
 try {
-  // validate input data
+  // validating input data
   await validateInput(input, validations);
   // saving input object the the database
   result = await mongo.collection('users').insertOne(input);
@@ -101,7 +105,7 @@ try {
 console.log({result, errors});
 ```
 
-When this code is run for the second time the `errors` variable will contain an error message in the same format as validation error message. This is great because your server can directly respond with these user-friendly information.
+When this code is executed for the second time the `errors` variable will contain an error message in the same format as validation error messages. This is great because your server can directly respond with this user-friendly information.
 
 ```json
 {
@@ -119,4 +123,49 @@ When this code is run for the second time the `errors` variable will contain an 
 
 ## API
 
-TODO
+The core of this package represents the `Approval` class.
+
+```js
+import {Approval} from 'approved';
+
+const approval = new Approval();
+```
+
+### Instance Methods
+
+#### approval.validateInput(input, validations);
+
+> Validates data object against the provided validations and throws a ValidationError if at least one key value is not valid.
+
+| Arguments | Type | Required | Description
+|-----------|------|----------|------------
+| input | Object | Yes | Data object with keys to be validated.
+| validations | Array | Yes | List of validation objects.
+
+```js
+validateInput({
+  name: 'John Smith'
+}, [
+  {path: 'name', validator: 'isPresent', message: 'must be present'},
+])
+```
+
+#### approval.handleError(error, handlers);
+
+> Handles the provided Error object based on the provided handlers.
+
+| Arguments | Type | Required | Description
+|-----------|------|----------|------------
+| error | Object | Yes | Error class instance or error object.
+| handlers | Array | Yes | List of handler objects.
+
+```js
+try {
+  throw new Error('Fake error');
+} catch(err) {
+  let errors = handleError(err, [
+    { path: 'base', error: 'Error', message: 'something went wrong'
+    }
+  ]);
+}
+```
