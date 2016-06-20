@@ -53,7 +53,7 @@ export class Approval {
   }
 
   async handleError(err, handlers, options={}) {
-    if (err instanceof this.ValidationError) {
+    if (err instanceof ValidationError) {
       return err.errors;
     }
 

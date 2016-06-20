@@ -1,117 +1,133 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Approval = exports.ValidationError = undefined;
+
+var _es6Error = require('es6-error');
+
+var _es6Error2 = _interopRequireDefault(_es6Error);
+
+var _dottie = require('dottie');
+
+var _dottie2 = _interopRequireDefault(_dottie);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 
-const ExtendableError = require('es6-error');
-const dottie = require('dottie');
+class ValidationError extends _es6Error2.default {
 
-exports.validators = {
-  isPresent: require('./validators/isPresent'),
-  isAbsent: require('./validators/isAbsent'),
-  isLength: require('./validators/isLength'),
-  custom: require('./validators/custom')
-};
-
-exports.ValidationError = class extends ExtendableError {
   constructor(errors) {
-    let message = arguments.length <= 1 || arguments[1] === undefined ? 'Input is invalid' : arguments[1];
+    let message = arguments.length <= 1 || arguments[1] === undefined ? 'Validation failed' : arguments[1];
 
     super(message);
     this.name = 'ValidationError';
     this.code = 422;
     this.errors = errors;
   }
-};
 
-exports.showValidationError = (() => {
-  var ref = _asyncToGenerator(function* (errors) {
-    let options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+}
 
-    if (errors.length > 0) {
-      throw new exports.ValidationError(errors);
-    }
-  });
+exports.ValidationError = ValidationError;
+class Approval {
 
-  return function (_x3) {
-    return ref.apply(this, arguments);
-  };
-})();
+  constructor() {
+    this.validators = {
+      isPresent: require('./validators/isPresent'),
+      isAbsent: require('./validators/isAbsent'),
+      isLength: require('./validators/isLength'),
+      custom: require('./validators/custom')
+    };
+  }
 
-exports.validateInput = (() => {
-  var ref = _asyncToGenerator(function* (input, validations) {
-    let options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+  showValidationError(errors) {
+    var _arguments = arguments;
+    return _asyncToGenerator(function* () {
+      let options = _arguments.length <= 1 || _arguments[1] === undefined ? {} : _arguments[1];
 
-    let errors = [];
+      if (errors.length > 0) {
+        throw new ValidationError(errors);
+      }
+    })();
+  }
 
-    for (let validation of validations) {
-      let path = validation.path;
-      let message = validation.message;
+  validateInput(input, validations) {
+    var _arguments2 = arguments,
+        _this = this;
 
-      let validatorName = validation.validator;
+    return _asyncToGenerator(function* () {
+      let options = _arguments2.length <= 2 || _arguments2[2] === undefined ? {} : _arguments2[2];
 
-      let validator = exports.validators[validatorName];
-      if (!validator) {
-        throw new Error(`Unknown validator ${ validatorName }`);
+      let errors = [];
+
+      for (let validation of validations) {
+        let path = validation.path;
+        let message = validation.message;
+
+        let validatorName = validation.validator;
+
+        let validator = _this.validators[validatorName];
+        if (!validator) {
+          throw new Error(`Unknown validator ${ validatorName }`);
+        }
+
+        let value = _dottie2.default.get(input, path, null);
+        let validatorOptions = Object.assign({}, validation, options);
+        let isValid = yield validator(value, validatorOptions);
+        if (!isValid) {
+          errors.push({ path, message });
+        }
       }
 
-      let value = dottie.get(input, path, null);
-      let validatorOptions = Object.assign({}, validation, options);
-      let isValid = yield validator(value, validatorOptions);
-      if (!isValid) {
-        errors.push({ path, message });
-      }
-    }
+      return yield _this.showValidationError(errors, options);
+    })();
+  }
 
-    return yield exports.showValidationError(errors, options);
-  });
+  handleError(err, handlers) {
+    var _arguments3 = arguments,
+        _this2 = this;
 
-  return function (_x5, _x6) {
-    return ref.apply(this, arguments);
-  };
-})();
+    return _asyncToGenerator(function* () {
+      let options = _arguments3.length <= 2 || _arguments3[2] === undefined ? {} : _arguments3[2];
 
-exports.handleError = (() => {
-  var ref = _asyncToGenerator(function* (err, handlers) {
-    let options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-    if (err instanceof exports.ValidationError) {
-      return err.errors;
-    }
-
-    let handler = null;
-    for (let handlerCandidate of handlers) {
-
-      if (!( // name
-      handlerCandidate.error === err.name || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error)) {
-        continue;
+      if (err instanceof _this2.ValidationError) {
+        return err.errors;
       }
 
-      if (!( // code
-      typeof handlerCandidate.code === 'undefined' || typeof handlerCandidate.code !== 'undefined' && handlerCandidate.code === err.code)) {
-        continue;
+      let handler = null;
+      for (let handlerCandidate of handlers) {
+
+        if (!( // name
+        handlerCandidate.error === err.name || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error)) {
+          continue;
+        }
+
+        if (!( // code
+        typeof handlerCandidate.code === 'undefined' || typeof handlerCandidate.code !== 'undefined' && handlerCandidate.code === err.code)) {
+          continue;
+        }
+
+        if (!( // block
+        typeof handlerCandidate.block === 'undefined' || typeof handlerCandidate.block !== 'undefined' && (yield handlerCandidate.block(err, options)))) {
+          continue;
+        }
+
+        handler = handlerCandidate;
+        break;
       }
 
-      if (!( // block
-      typeof handlerCandidate.block === 'undefined' || typeof handlerCandidate.block !== 'undefined' && (yield handlerCandidate.block(err, options)))) {
-        continue;
+      if (handler) {
+        var _handler = handler;
+        let path = _handler.path;
+        let message = _handler.message;
+
+        return [{ path, message }];
+      } else {
+        return null;
       }
-
-      handler = handlerCandidate;
-      break;
-    }
-
-    if (handler) {
-      var _handler = handler;
-      let path = _handler.path;
-      let message = _handler.message;
-
-      return [{ path, message }];
-    } else {
-      return null;
-    }
-  });
-
-  return function (_x8, _x9) {
-    return ref.apply(this, arguments);
-  };
-})();
+    })();
+  }
+}
+exports.Approval = Approval;
