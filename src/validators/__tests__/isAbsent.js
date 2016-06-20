@@ -4,7 +4,7 @@ let approval = new Approval();
 
 describe('isAbsent', () => {
 
-  it('stops unless value is blank', async () => {
+  it('fails unless value is blank', async () => {
     try {
       await approval.validateInput({
         name: 'John'

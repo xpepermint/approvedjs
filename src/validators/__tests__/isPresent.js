@@ -4,7 +4,7 @@ let approval = new Approval();
 
 describe('isPresent', () => {
 
-  it('stops undefined values', async () => {
+  it('fails when value is undefined', async () => {
     try {
       await approval.validateInput({}, [{
         path: 'name',
@@ -16,7 +16,7 @@ describe('isPresent', () => {
     }
   });
 
-  it('stops null values', async () => {
+  it('fails when value is null', async () => {
     try {
       await approval.validateInput({
         name: null
@@ -30,7 +30,7 @@ describe('isPresent', () => {
     }
   });
 
-  it('stops empty strings', async () => {
+  it('fails when value is blank', async () => {
     try {
       await approval.validateInput({
         name: ''

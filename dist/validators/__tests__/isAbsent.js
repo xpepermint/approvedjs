@@ -12,7 +12,7 @@ let approval = new Approval();
 
 describe('isAbsent', () => {
 
-  it('stops unless value is blank', _asyncToGenerator(function* () {
+  it('fails unless value is blank', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
         name: 'John'

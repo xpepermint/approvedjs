@@ -42,7 +42,7 @@ export class Approval {
       }
 
       let value = dottie.get(input, path, null);
-      let isValid = await validator(value, validation.options, options);
+      let isValid = await validator(value, validation.options||{}, options||{});
       if (!isValid) {
         errors.push({path, message});
       }

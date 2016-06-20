@@ -12,25 +12,25 @@ let approval = new Approval();
 
 describe('isValid', () => {
 
-  it('validates synchronous code block', _asyncToGenerator(function* () {
+  it('fails when synchronous validation block returns false', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
         name: 'fake'
       }, [{
         path: 'name',
         options: { block: function (value) {
-            return value === 'fake';
+            return value !== 'fake';
           } },
         validator: 'isValid',
-        message: 'is fake'
+        message: 'is invalid'
       }]);
+      expect(false).toEqual(true);
     } catch (err) {
-      let errors = yield approval.handleError(err);
-      expect(errors).toEqual([]);
+      expect((yield approval.handleError(err))).toEqual([{ path: 'name', message: 'is invalid' }]);
     }
   }));
 
-  it('validates asynchronous code block', _asyncToGenerator(function* () {
+  it('fails when asynchronous validation block returns false', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
         name: 'fake'
@@ -38,7 +38,7 @@ describe('isValid', () => {
         path: 'name',
         options: { block: (() => {
             var ref = _asyncToGenerator(function* (value) {
-              return value === 'fake';
+              return value !== 'fake';
             });
 
             return function block(_x) {
@@ -46,24 +46,22 @@ describe('isValid', () => {
             };
           })() },
         validator: 'isValid',
-        message: 'is fake'
+        message: 'is invalid'
       }]);
+      expect(false).toEqual(true);
     } catch (err) {
-      let errors = yield approval.handleError(err);
-      expect(errors).toEqual([]);
+      expect((yield approval.handleError(err))).toEqual([{ path: 'name', message: 'is invalid' }]);
     }
   }));
 
-  it('code block have access to validateInput options', _asyncToGenerator(function* () {
+  it('can access validateInput options', _asyncToGenerator(function* () {
     try {
-      yield approval.validateInput({
-        name: 'fake'
-      }, [{
+      yield approval.validateInput({}, [{
         path: 'name',
         options: { block: (() => {
             var ref = _asyncToGenerator(function* (value, _ref) {
               let ctx = _ref.ctx;
-              return ctx === 'context';
+              return !(ctx === 'context');
             });
 
             return function block(_x2, _x3) {
@@ -71,11 +69,11 @@ describe('isValid', () => {
             };
           })() },
         validator: 'isValid',
-        message: 'is fake'
+        message: 'is invalid'
       }], { ctx: 'context' });
+      expect(false).toEqual(true);
     } catch (err) {
-      let errors = yield approval.handleError(err);
-      expect(errors).toEqual([]);
+      expect((yield approval.handleError(err))).toEqual([{ path: 'name', message: 'is invalid' }]);
     }
   }));
 });

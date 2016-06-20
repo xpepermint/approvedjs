@@ -74,7 +74,7 @@ class Approval {
         }
 
         let value = _dottie2.default.get(input, path, null);
-        let isValid = yield validator(value, validation.options, options);
+        let isValid = yield validator(value, validation.options || {}, options || {});
         if (!isValid) {
           errors.push({ path, message });
         }

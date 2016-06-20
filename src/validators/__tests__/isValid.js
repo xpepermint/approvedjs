@@ -4,51 +4,49 @@ let approval = new Approval();
 
 describe('isValid', () => {
 
-  it('validates synchronous code block', async () => {
+  it('fails when synchronous validation block returns false', async () => {
     try {
       await approval.validateInput({
         name: 'fake'
       }, [{
         path: 'name',
-        options: {block: (value) => value === 'fake'},
+        options: {block: (value) => value !== 'fake'},
         validator: 'isValid',
-        message: 'is fake'
+        message: 'is invalid'
       }]);
+      expect(false).toEqual(true);
     } catch(err) {
-      let errors = await approval.handleError(err);
-      expect(errors).toEqual([]);
+      expect(await approval.handleError(err)).toEqual([{path: 'name', message: 'is invalid'}]);
     }
   });
 
-  it('validates asynchronous code block', async () => {
+  it('fails when asynchronous validation block returns false', async () => {
     try {
       await approval.validateInput({
         name: 'fake'
       }, [{
         path: 'name',
-        options: {block: async (value) => value === 'fake'},
+        options: {block: async (value) => value !== 'fake'},
         validator: 'isValid',
-        message: 'is fake'
+        message: 'is invalid'
       }]);
+      expect(false).toEqual(true);
     } catch(err) {
-      let errors = await approval.handleError(err);
-      expect(errors).toEqual([]);
+      expect(await approval.handleError(err)).toEqual([{path: 'name', message: 'is invalid'}]);
     }
   });
 
-  it('code block have access to validateInput options', async () => {
+  it('can access validateInput options', async () => {
     try {
-      await approval.validateInput({
-        name: 'fake'
-      }, [{
+      await approval.validateInput({}, [{
         path: 'name',
-        options: {block: async (value, {ctx}) => ctx === 'context'},
+        options: {block: async (value, {ctx}) => !(ctx === 'context')},
         validator: 'isValid',
-        message: 'is fake'
+        message: 'is invalid'
       }], {ctx: 'context'});
+      expect(false).toEqual(true);
     } catch(err) {
-      let errors = await approval.handleError(err);
-      expect(errors).toEqual([]);
+      expect(await approval.handleError(err)).toEqual([{path: 'name', message: 'is invalid'}]);
     }
   });
 

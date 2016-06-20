@@ -4,7 +4,7 @@ let approval = new Approval();
 
 describe('validateInput', () => {
 
-  it('throws ValidationError on invalid input', async () => {
+  it('throws a ValidationError on invalid input', async () => {
     try {
       await approval.validateInput({}, [{
         path: 'name',
@@ -16,23 +16,11 @@ describe('validateInput', () => {
     }
   });
 
-  it('thrown ValidationError includes error messages of invalid fields', async () => {
-    try {
-      await approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'name', message: 'must be present'}]);
-    }
-  });
-
 });
 
 describe('handleError', () => {
 
-  it('handles validation errors', async () => {
+  it('handles validation error', async () => {
     try {
       await approval.validateInput({}, [{
         path: 'name',
@@ -40,8 +28,7 @@ describe('handleError', () => {
         message: 'must be present'
       }]);
     } catch(err) {
-      let errors = await approval.handleError(err);
-      expect(errors).toEqual([{path: 'name', message: 'must be present'}]);
+      expect(await approval.handleError(err)).toEqual([{path: 'name', message: 'must be present'}]);
     }
   });
 
@@ -49,12 +36,11 @@ describe('handleError', () => {
     try {
       throw new Error('something went wrong');
     } catch(err) {
-      let errors = await approval.handleError(err, [{
+      expect(await approval.handleError(err, [{
         path: 'system',
         error: 'Error',
         message: 'fake error'
-      }]);
-      expect(errors).toEqual([{path: 'system', message: 'fake error'}]);
+      }])).toEqual([{path: 'system', message: 'fake error'}]);
     }
   });
 

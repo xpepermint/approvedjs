@@ -12,7 +12,7 @@ let approval = new Approval();
 
 describe('validateInput', () => {
 
-  it('throws ValidationError on invalid input', _asyncToGenerator(function* () {
+  it('throws a ValidationError on invalid input', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({}, [{
         path: 'name',
@@ -23,23 +23,11 @@ describe('validateInput', () => {
       expect(err instanceof ValidationError).toEqual(true);
     }
   }));
-
-  it('thrown ValidationError includes error messages of invalid fields', _asyncToGenerator(function* () {
-    try {
-      yield approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
-    } catch (err) {
-      expect(err.errors).toEqual([{ path: 'name', message: 'must be present' }]);
-    }
-  }));
 });
 
 describe('handleError', () => {
 
-  it('handles validation errors', _asyncToGenerator(function* () {
+  it('handles validation error', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({}, [{
         path: 'name',
@@ -47,8 +35,7 @@ describe('handleError', () => {
         message: 'must be present'
       }]);
     } catch (err) {
-      let errors = yield approval.handleError(err);
-      expect(errors).toEqual([{ path: 'name', message: 'must be present' }]);
+      expect((yield approval.handleError(err))).toEqual([{ path: 'name', message: 'must be present' }]);
     }
   }));
 
@@ -56,12 +43,11 @@ describe('handleError', () => {
     try {
       throw new Error('something went wrong');
     } catch (err) {
-      let errors = yield approval.handleError(err, [{
+      expect((yield approval.handleError(err, [{
         path: 'system',
         error: 'Error',
         message: 'fake error'
-      }]);
-      expect(errors).toEqual([{ path: 'system', message: 'fake error' }]);
+      }]))).toEqual([{ path: 'system', message: 'fake error' }]);
     }
   }));
 });

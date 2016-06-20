@@ -12,7 +12,7 @@ let approval = new Approval();
 
 describe('isPresent', () => {
 
-  it('stops undefined values', _asyncToGenerator(function* () {
+  it('fails when value is undefined', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({}, [{
         path: 'name',
@@ -24,7 +24,7 @@ describe('isPresent', () => {
     }
   }));
 
-  it('stops null values', _asyncToGenerator(function* () {
+  it('fails when value is null', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
         name: null
@@ -38,7 +38,7 @@ describe('isPresent', () => {
     }
   }));
 
-  it('stops empty strings', _asyncToGenerator(function* () {
+  it('fails when value is blank', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
         name: ''
