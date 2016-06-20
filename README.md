@@ -60,8 +60,16 @@ Continue by defining a sequence of validations for the `firstName` field.
 
 ```js
 const validations = [
-  {path: 'firstName', validator: 'isPresent', message: 'must be present'},
-  {path: 'firstName', validator: 'isLength', options: {min: 2, max: 50}, message: 'can be between 2 and 50'}
+  {
+    path: 'firstName',
+    validator: 'isPresent',
+    message: 'must be present'
+  },{
+    path: 'firstName',
+    validator: 'isLength',
+    options: {min: 2, max: 50},
+    message: 'can be between 2 and 50'
+  }
 ];
 ```
 
@@ -79,9 +87,14 @@ To catch and handle errors we need to define a sequence of handlers which tell h
 import mongoParser from 'mongo-error-parser';
 
 const handlers = [
-  { path: 'firstName', error: 'MongoError', code: 11000, block: async (err, options) => mongoParser(err).index === 'uniqueFirstName', message: 'is already taken'
+  {
+    path: 'firstName',
+    error: 'MongoError',
+    code: 11000,
+    block: async (err, options) => mongoParser(err).index === 'uniqueFirstName',
+    message: 'is already taken'
   }
-]
+];
 ```
 
 Add a try/catch block which validates input data, saves data to the database and catches errors.
@@ -145,9 +158,11 @@ const approval = new Approval();
 ```js
 validateInput({
   name: 'John Smith'
-}, [
-  {path: 'name', validator: 'isPresent', message: 'must be present'},
-])
+}, [{
+  path: 'name',
+  validator: 'isPresent',
+  message: 'must be present'
+}])
 ```
 
 #### approval.handleError(error, handlers);
@@ -163,9 +178,11 @@ validateInput({
 try {
   throw new Error('Fake error');
 } catch(err) {
-  let errors = handleError(err, [
-    { path: 'base', error: 'Error', message: 'something went wrong'}
-  ]);
+  let errors = handleError(err, [{
+    path: 'base',
+    error: 'Error',
+    message: 'something went wrong'
+  }]);
 }
 ```
 
@@ -182,7 +199,9 @@ Validation object defines how a value of an input object key should be validated
 
 ```js
 let validation = {
-  path: 'name', validator: 'isPresent', message: 'must be present'
+  path: 'name',
+  validator: 'isPresent',
+  message: 'must be present'
 };
 ```
 
@@ -207,7 +226,10 @@ let validation = {
 
 ```js
 let validation = {
-  path: 'name', validator: 'isLength', options: {min: 5, max: 10}, message: 'must be between 5 and 10 long'
+  path: 'name',
+  validator: 'isLength',
+  options: {min: 5, max: 10},
+  message: 'must be between 5 and 10 long'
 };
 ```
 
@@ -221,6 +243,9 @@ let validation = {
 
 ```js
 let validation = {
-  { path: 'name', validator: 'isValid', options: {block: async (value, options) => true}, message: 'must be present'}
+  path: 'name',
+  validator: 'isValid',
+  options: {block: async (value, options) => true},
+  message: 'must be present'
 };
 ```
