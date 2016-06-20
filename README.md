@@ -61,7 +61,7 @@ Continue by defining a sequence of validations for the `firstName` field.
 ```js
 const validations = [
   {path: 'firstName', validator: 'isPresent', message: 'must be present'},
-  {path: 'firstName', validator: 'isLength', min: 2, max: 50, message: 'can be between 2 and 50'}
+  {path: 'firstName', validator: 'isLength', options: {min: 2, max: 50}, message: 'can be between 2 and 50'}
 ];
 ```
 
@@ -164,8 +164,63 @@ try {
   throw new Error('Fake error');
 } catch(err) {
   let errors = handleError(err, [
-    { path: 'base', error: 'Error', message: 'something went wrong'
-    }
+    { path: 'base', error: 'Error', message: 'something went wrong'}
   ]);
 }
+```
+
+### Validations
+
+Validation object defines how a value of an input object key should be validated.
+
+| Key | Type | Required | Description
+|-----|------|----------|------------
+| path | String | Yes | Key name of an input object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
+| validator | String | Yes | Validator name (see the `Built-in Validators` section for a list of available names).
+| options | Object | No | Validator settings.
+| message | String | Yes | Output error message explaining what went wrong.
+
+```js
+let validation = {
+  path: 'name', validator: 'isPresent', message: 'must be present'
+};
+```
+
+#### Built-in Validators
+
+##### isPresent
+
+> Validates that the specified attribute is not blank.
+
+##### isAbsence
+
+> Validates that the specified attribute is blank.
+
+##### isLength
+
+> Validates that length of the specified attribute.
+
+| Option | Type | Required | Description
+|--------|------|----------|------------
+| min | Number | No | Minimum number of characters.
+| max | Number | No | Maximum number of characters.
+
+```js
+let validation = {
+  path: 'name', validator: 'isLength', options: {min: 5, max: 10}, message: 'must be between 5 and 10 long'
+};
+```
+
+##### isValid
+
+> Validates the specified attribute against the provided block function. If the function returns true then the attribute is treated as valid.
+
+| Option | Type | Required | Description
+|--------|------|----------|------------
+| block | Function | Yes | Synchronous or asynchronous function (e.g. `async () => true`)
+
+```js
+let validation = {
+  { path: 'name', validator: 'isValid', options: {block: async (value, options) => true}, message: 'must be present'}
+};
 ```

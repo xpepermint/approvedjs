@@ -19,7 +19,7 @@ export class Approval {
       isPresent: require('./validators/isPresent'),
       isAbsent: require('./validators/isAbsent'),
       isLength: require('./validators/isLength'),
-      custom: require('./validators/custom'),
+      isValid: require('./validators/isValid'),
     };
   }
 
@@ -42,8 +42,7 @@ export class Approval {
       }
 
       let value = dottie.get(input, path, null);
-      let validatorOptions = Object.assign({}, validation, options);
-      let isValid = await validator(value, validatorOptions);
+      let isValid = await validator(value, validation.options, options);
       if (!isValid) {
         errors.push({path, message});
       }

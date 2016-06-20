@@ -38,7 +38,7 @@ class Approval {
       isPresent: require('./validators/isPresent'),
       isAbsent: require('./validators/isAbsent'),
       isLength: require('./validators/isLength'),
-      custom: require('./validators/custom')
+      isValid: require('./validators/isValid')
     };
   }
 
@@ -74,8 +74,7 @@ class Approval {
         }
 
         let value = _dottie2.default.get(input, path, null);
-        let validatorOptions = Object.assign({}, validation, options);
-        let isValid = yield validator(value, validatorOptions);
+        let isValid = yield validator(value, validation.options, options);
         if (!isValid) {
           errors.push({ path, message });
         }
@@ -86,13 +85,11 @@ class Approval {
   }
 
   handleError(err, handlers) {
-    var _arguments3 = arguments,
-        _this2 = this;
-
+    var _arguments3 = arguments;
     return _asyncToGenerator(function* () {
       let options = _arguments3.length <= 2 || _arguments3[2] === undefined ? {} : _arguments3[2];
 
-      if (err instanceof _this2.ValidationError) {
+      if (err instanceof ValidationError) {
         return err.errors;
       }
 
