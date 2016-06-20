@@ -1,4 +1,4 @@
-const {Approval, ValidationError} = require('../..');
+const {Approval} = require('../..');
 
 let approval = new Approval();
 

@@ -9,20 +9,21 @@ const Approval = _require.Approval;
 
 let approval = new Approval();
 
-describe('isAbsent', () => {
+describe('isEmail', () => {
 
-  it('fails unless value is blank', _asyncToGenerator(function* () {
+  it('fails when string is not an email', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({
-        name: 'John'
+        email: 'fake'
       }, [{
-        path: 'name',
-        validator: 'isAbsent',
-        message: 'must be blank'
+        path: 'email',
+        validator: 'isEmail',
+        message: 'is not an email'
       }]);
       expect(false).toEqual(true);
     } catch (err) {
-      expect(err.errors).toEqual([{ path: 'name', message: 'must be blank' }]);
+      console.log(err);
+      expect(err.errors).toEqual([{ path: 'email', message: 'is not an email' }]);
     }
   }));
 });

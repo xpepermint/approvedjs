@@ -217,15 +217,6 @@ let validation = {
 |--------|------|----------|------------
 | seed | String | Yes | The seed which should exist in the string.
 
-```js
-let validation = {
-  path: 'name',
-  validator: 'contains',
-  options: {seed: 'John'},
-  message: 'must contain the John word'
-};
-```
-
 ##### isAbsent
 
 > Validates that the specified attribute is blank.
@@ -260,7 +251,13 @@ let validation = {
 
 ##### isEmail
 
--> TODO
+> Validates that the specified attribute is an email.
+
+| Option | Type | Required | Description
+|--------|------|----------|------------
+| allowDisplayName | Boolean | No | When set to true, the validator will also match `name <address>`.
+| allowUtf8LocalPart | Boolean | No | When set to false, the validator will not allow any non-English UTF8 character in email address' local part.
+| requireTld | Boolean | No | When set to false, email addresses without having TLD in their domain will also be matched.
 
 ##### isFQDN
 
@@ -299,14 +296,6 @@ let validation = {
 | min | Number | No | Minimum number of characters.
 | max | Number | No | Maximum number of characters.
 
-```js
-let validation = {
-  path: 'name',
-  validator: 'isLength',
-  options: {min: 5, max: 10},
-  message: 'must be between 5 and 10 long'
-};
-```
 ##### isLowercase
 
 -> TODO

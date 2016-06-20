@@ -5,7 +5,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 var _require = require('../..');
 
 const Approval = _require.Approval;
-const ValidationError = _require.ValidationError;
 
 
 let approval = new Approval();

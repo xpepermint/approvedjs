@@ -35,11 +35,12 @@ class Approval {
 
   constructor() {
     this.validators = {
-      isPresent: require('./validators/isPresent'),
+      contains: require('./validators/contains'),
       isAbsent: require('./validators/isAbsent'),
+      isEmail: require('./validators/isEmail'),
       isLength: require('./validators/isLength'),
-      isValid: require('./validators/isValid'),
-      contains: require('./validators/contains')
+      isPresent: require('./validators/isPresent'),
+      isValid: require('./validators/isValid')
     };
   }
 
