@@ -10,15 +10,45 @@ const ValidationError = _require.ValidationError;
 
 let approval = new Approval();
 
+describe('filterInput', () => {
+
+  it('filters input', _asyncToGenerator(function* () {
+    expect((yield approval.filterInput({
+      name: ' John  Smith  ',
+      email: 'john@smith.com'
+    }, [{
+      path: 'name',
+      type: 'string',
+      modifiers: ['squish']
+    }]))).toEqual({
+      name: 'John Smith'
+    });
+  }));
+});
+
 describe('validateInput', () => {
 
-  it('throws a ValidationError on invalid input', _asyncToGenerator(function* () {
+  it('validates invalid input', _asyncToGenerator(function* () {
     try {
       yield approval.validateInput({}, [{
         path: 'name',
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(true).toEqual(false);
+    } catch (err) {
+      expect(err instanceof ValidationError).toEqual(true);
+    }
+  }));
+
+  it('validates invalid nested input', _asyncToGenerator(function* () {
+    try {
+      yield approval.validateInput({}, [{
+        path: 'user.name',
+        validator: 'isPresent',
+        message: 'must be present'
+      }]);
+      expect(true).toEqual(false);
     } catch (err) {
       expect(err instanceof ValidationError).toEqual(true);
     }
@@ -34,6 +64,7 @@ describe('handleError', () => {
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(true).toEqual(false);
     } catch (err) {
       expect((yield approval.handleError(err))).toEqual([{ path: 'name', message: 'must be present' }]);
     }

@@ -140,9 +140,9 @@ When this code is executed for the second time the `errors` variable will contai
 
 ### Input Filters
 
-In most cases we deal with data objects thus type casting isn't needed. However, in some cases we need to extract certain keys into a new object. In some cases we need to cast values to a certain data type.
+In most cases we deal with data objects thus type casting isn't needed. However, in some cases we need to extract certain keys into a new object. In some cases we also need to cast values to a certain data type.
 
-Approved.js includes a method called `filterInput` which allows for filtering input against a list of  filters we provide. This is great for cases where we need to save an object to a database thus we can first filter out unknown keys, modify object values and then safely insert data into the database.
+Approved.js includes a method called `filterInput` which allows for filtering input against a list of  filters we provide. This is great for cases where we need to save an object to a database thus we can first filter out unknown keys, modify object values and then safely insert data into a database.
 
 Let's first define `filters` for our input object.
 
@@ -257,7 +257,7 @@ Modifiers transform a value.
 
 ##### squish
 
-> Returns whitespace on both ends of the string and changes remaining consecutive whitespace groups into one space each.
+> Removes white-spaces on both ends of the string and changes remaining consecutive whitespace groups into one space each.
 
 ##### toLowerCase
 

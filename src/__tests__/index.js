@@ -2,15 +2,46 @@ const {Approval, ValidationError} = require('..');
 
 let approval = new Approval();
 
+describe('filterInput', () => {
+
+  it('filters input', async () => {
+    expect(await approval.filterInput({
+      name: ' John  Smith  ',
+      email: 'john@smith.com'
+    }, [{
+      path: 'name',
+      type: 'string',
+      modifiers: ['squish']
+    }])).toEqual({
+      name: 'John Smith'
+    })
+  });
+
+});
+
 describe('validateInput', () => {
 
-  it('throws a ValidationError on invalid input', async () => {
+  it('validates invalid input', async () => {
     try {
       await approval.validateInput({}, [{
         path: 'name',
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(true).toEqual(false);
+    } catch(err) {
+      expect(err instanceof ValidationError).toEqual(true);
+    }
+  });
+
+  it('validates invalid nested input', async () => {
+    try {
+      await approval.validateInput({}, [{
+        path: 'user.name',
+        validator: 'isPresent',
+        message: 'must be present'
+      }]);
+      expect(true).toEqual(false);
     } catch(err) {
       expect(err instanceof ValidationError).toEqual(true);
     }
@@ -27,6 +58,7 @@ describe('handleError', () => {
         validator: 'isPresent',
         message: 'must be present'
       }]);
+      expect(true).toEqual(false);
     } catch(err) {
       expect(
         await approval.handleError(err)
