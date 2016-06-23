@@ -295,7 +295,7 @@ let validation = {
 > Validates that the specified attribute is an IP.
 
 | Option | Type | Required | Default | Description
-|--------|------|----------|----------------------
+|--------|------|----------|---------|-------------
 | version | Integer | No | - | IP version (4 or 6).
 
 ##### isISBN
@@ -303,7 +303,7 @@ let validation = {
 > Validates that the specified attribute is an [International Standard Book Number](https://en.wikipedia.org/wiki/International_Standard_Book_Number).
 
 | Option | Type | Required | Default | Description
-|--------|------|----------|----------------------
+|--------|------|----------|---------|------------
 | version | Integer | No | - | IP version (10 or 13).
 
 ##### isISIN
