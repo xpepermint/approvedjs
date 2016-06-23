@@ -213,120 +213,157 @@ let validation = {
 
 > Checks if the string contains the seed.
 
-| Option | Type | Required | Description
-|--------|------|----------|------------
-| seed | String | Yes | The seed which should exist in the string.
+| Option | Type | Required | Default | Description
+|--------|------|---------|----------|------------
+| seed | String | Yes | - | The seed which should exist in the string.
 
 ##### isAbsent
 
 > Validates that the specified attribute is blank.
 
-##### isAlpha
-
--> TODO
-
-##### isAlphanumeric
-
--> TODO
-
-##### isAscii
-
--> TODO
-
 ##### isBase64
 
--> TODO
+> Validates that the specified attribute is base64 encoded string.
+
+##### isByteLength
+
+> Validates that the specified attribute is a string where length (in bytes) falls in a range.
+
+| Option | Type | Required | Default | Description
+|--------|------|----------|---------|------------
+| min | Integer | Yes | 0 | Minimum number in bytes.
+| max | Integer | Yes | - | Maximum number in bytes.
 
 ##### isCreditCard
 
--> TODO
-
-##### isDataURI
-
--> TODO
+> Validates that the specified attribute is a credit card number.
 
 ##### isDate
 
--> TODO
+> Validates that the specified attribute is a date string.
+
+| Option | Type | Required | Default | Description
+|--------|------|----------|---------|------------
+| format | String | No | - | Date format (possible value is `iso8601`).
 
 ##### isEmail
 
 > Validates that the specified attribute is an email.
 
+| Option | Type | Required | Default | Description
+|--------|------|----------|----------|------------
+| allowDisplayName | Boolean | No | false | When set to true, the validator will also match `name <address>`.
+| allowUtf8LocalPart | Boolean | No | false | When set to false, the validator will not allow any non-English UTF8 character in email address' local part.
+| requireTld | Boolean | No | true | When set to false, email addresses without having TLD in their domain will also be matched.
+
+##### isExcluded
+
+> Validates that the specified attribute is not in an array of restricted values.
+
 | Option | Type | Required | Description
 |--------|------|----------|------------
-| allowDisplayName | Boolean | No | When set to true, the validator will also match `name <address>`.
-| allowUtf8LocalPart | Boolean | No | When set to false, the validator will not allow any non-English UTF8 character in email address' local part.
-| requireTld | Boolean | No | When set to false, email addresses without having TLD in their domain will also be matched.
+| values | Array | Yes | Array of restricted values.
 
 ##### isFQDN
 
--> TODO
-
-##### isHexColor
-
--> TODO
-
-##### isIP
-
--> TODO
-
-##### isISBN
-
--> TODO
-
-##### isISIN
-
--> TODO
-
-##### isIn
-
--> TODO
-
-##### isJSON
-
--> TODO
-
-##### isLength
-
-> Validates that length of the specified attribute.
+> Validates that the specified attribute is a fully qualified domain name (e.g. domain.com).
 
 | Option | Type | Required | Description
 |--------|------|----------|------------
-| min | Number | No | Minimum number of characters.
-| max | Number | No | Maximum number of characters.
+| requireTld | Boolean | No | Require top-level domain name.
+| allowUnderscores | Boolean | No | Allow string to include underscores.
+| allowTrailingDot | Boolean | No | Allow string to include a trailing dot.
+
+##### isHexadecimal
+
+> Validates that the specified attribute is a hexadecimal number.
+
+##### isHexColor
+
+> Validates that the specified attribute is a hexadecimal color string.
+
+##### isIncluded
+
+> Validates that the specified attribute is in an array of allowed values.
+
+| Option | Type | Required | Description
+|--------|------|----------|------------
+| values | Array | Yes | Array of allowed values.
+
+##### isIP
+
+> Validates that the specified attribute is an IP.
+
+| Option | Type | Required | Default | Description
+|--------|------|----------|----------------------
+| version | Integer | No | - | IP version (4 or 6).
+
+##### isISBN
+
+> Validates that the specified attribute is an [International Standard Book Number](https://en.wikipedia.org/wiki/International_Standard_Book_Number).
+
+| Option | Type | Required | Default | Description
+|--------|------|----------|----------------------
+| version | Integer | No | - | IP version (10 or 13).
+
+##### isISIN
+
+> Validates that the specified attribute is an [International Securities Identification](https://en.wikipedia.org/wiki/International_Securities_Identification_Number).
+
+##### isJSON
+
+> Validates that the specified attribute is a stringified JSON string.
+
+##### isLength
+
+> Validates the length of the specified attribute.
+
+| Option | Type | Required | Default | Description
+|--------|------|----------|----------|------------
+| min | Number | No | 0 | Minimum number of characters.
+| max | Number | No | - | Maximum number of characters.
 
 ##### isLowercase
 
--> TODO
+> Validates that the specified attribute is lowercase.
 
 ##### isMACAddress
 
--> TODO
-
-##### isMobilePhone
-
--> TODO
+> Validates that the specified attribute is a MAC address.
 
 ##### isMongoId
 
--> TODO
+> Validates that the specified attribute is a valid hex-encoded representation of a [MongoDB ObjectId](http://docs.mongodb.org/manual/reference/object-id/).
 
 ##### isPresent
 
 > Validates that the specified attribute is not blank.
 
+##### isUppercase
+
+> Validates that the specified attribute is uppercase.
+
 ##### isURL
 
--> TODO
+> Validates that the specified attribute is an URL.
+
+| Option | Type | Required | Default | Description
+|--------|------|----------|---------|------------
+| protocols | Array | No | ['http', 'https', 'ftp'] | List of known protocols (e.g. http, https, ftp).
+| requireTld | Boolean | No | true | Require top-level domain name.
+| requireProtocol | Boolean | No | true | Require URL protocol.
+| requireValidProtocol | Boolean | No | true | Require a valid protocol.
+| allowUnderscores | Boolean | No | false | Allow using underscores.
+| allowTrailingDot | Boolean | No | false | Allow trailing dot.
+| allowProtocolRelativeUrls | Boolean | No | false | Allow protocol relative urls (e.g. //foobar.com)
 
 ##### isUUID
 
--> TODO
+> Validates that the specified attribute is a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
 
-##### isUppercase
-
--> TODO
+| Option | Type | Required | Description
+|--------|------|----------|------------
+| version | Integer | No | UUID version (3, 4 or 5).
 
 ##### isValid
 
@@ -347,7 +384,12 @@ let validation = {
 
 ##### matches
 
--> TODO
+> Validates that the specified attribute matches the pattern.
+
+| Key | Type | Required | Description
+|-----|------|----------|------------
+| pattern | String | Yes | Regular expression pattern.
+| modifiers | String | No | Regular expression modifiers.
 
 ### Handlers
 

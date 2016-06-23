@@ -1,23 +1,21 @@
-const {Approval} = require('../..');
-
-let approval = new Approval();
+const validator = require('../isLength');
 
 describe('isLength', () => {
 
-  it('fails when string size is not in the min/max range', async () => {
-    try {
-      await approval.validateInput({
-        name: 'John Smith'
-      }, [{
-        path: 'name',
-        validator: 'isLength',
-        options: {min: 3, max: 5},
-        message: 'must be between 5 and 10'
-      }]);
-      expect(false).toEqual(true);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'name', message: 'must be between 5 and 10'}]);
-    }
+  it('fails when not a string', async () => {
+    expect(validator(true)).toEqual(false);
+  });
+
+  it('fails when too short', async () => {
+    expect(validator('hello', {min: 10})).toEqual(false);
+  });
+
+  it('fails when too long', async () => {
+    expect(validator('hello', {max: 2})).toEqual(false);
+  });
+
+  it('passes without options', async () => {
+    expect(validator('hello')).toEqual(true);
   });
 
 });

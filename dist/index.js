@@ -37,10 +37,30 @@ class Approval {
     this.validators = {
       contains: require('./validators/contains'),
       isAbsent: require('./validators/isAbsent'),
+      isBase64: require('./validators/isBase64'),
+      isByteLength: require('./validators/isByteLength'),
+      isCreditCard: require('./validators/isCreditCard'),
+      isDate: require('./validators/isDate'),
       isEmail: require('./validators/isEmail'),
+      isExcluded: require('./validators/isExcluded'),
+      isFQDN: require('./validators/isFQDN'),
+      isHexadecimal: require('./validators/isHexadecimal'),
+      isHexColor: require('./validators/isHexColor'),
+      isIncluded: require('./validators/isIncluded'),
+      isIP: require('./validators/isIP'),
+      isISBN: require('./validators/isISBN'),
+      isISIN: require('./validators/isISIN'),
+      isJSON: require('./validators/isJSON'),
       isLength: require('./validators/isLength'),
+      isLowercase: require('./validators/isLowercase'),
+      isMACAddress: require('./validators/isMACAddress'),
+      isMongoId: require('./validators/isMongoId'),
       isPresent: require('./validators/isPresent'),
-      isValid: require('./validators/isValid')
+      isUppercase: require('./validators/isUppercase'),
+      isURL: require('./validators/isURL'),
+      isUUID: require('./validators/isUUID'),
+      isValid: require('./validators/isValid'),
+      matches: require('./validators/matches')
     };
   }
 

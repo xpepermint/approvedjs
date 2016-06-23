@@ -28,7 +28,11 @@ describe('handleError', () => {
         message: 'must be present'
       }]);
     } catch(err) {
-      expect(await approval.handleError(err)).toEqual([{path: 'name', message: 'must be present'}]);
+      expect(
+        await approval.handleError(err)
+      ).toEqual([
+        {path: 'name', message: 'must be present'}
+      ]);
     }
   });
 
@@ -40,7 +44,9 @@ describe('handleError', () => {
         path: 'system',
         error: 'Error',
         message: 'fake error'
-      }])).toEqual([{path: 'system', message: 'fake error'}]);
+      }])).toEqual([
+        {path: 'system', message: 'fake error'}
+      ]);
     }
   });
 

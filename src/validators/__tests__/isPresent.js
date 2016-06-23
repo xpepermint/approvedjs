@@ -1,50 +1,21 @@
-const {Approval} = require('../..');
-
-let approval = new Approval();
+const validator = require('../isPresent');
 
 describe('isPresent', () => {
 
-  it('fails when value is undefined', async () => {
-    try {
-      await approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
-      expect(false).toEqual(true);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'name', message: 'must be present'}]);
-    }
+  it('fails when null', async () => {
+    expect(validator(null)).toEqual(false);
   });
 
-  it('fails when value is null', async () => {
-    try {
-      await approval.validateInput({
-        name: null
-      }, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
-      expect(false).toEqual(true);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'name', message: 'must be present'}]);
-    }
+  it('fails when undefined', async () => {
+    expect(validator()).toEqual(false);
   });
 
-  it('fails when value is blank', async () => {
-    try {
-      await approval.validateInput({
-        name: ''
-      }, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
-      expect(false).toEqual(true);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'name', message: 'must be present'}]);
-    }
+  it('fails when blank', async () => {
+    expect(validator('')).toEqual(false);
+  });
+
+  it('passes when present', async () => {
+    expect(validator('john')).toEqual(true);
   });
 
 });

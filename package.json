@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "An elegant and intuitive way of synchronous and asynchronous data validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
@@ -33,7 +33,7 @@
   "jest": {
     "testPathDirs": ["dist"],
     "unmockedModulePathPatterns": ["./"],
-    "collectCoverage": true
+    "collectCoverage": false
   },
   "author": "xpepermint (Kristijan Sedlak)",
   "license": "MIT",

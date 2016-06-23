@@ -5,14 +5,23 @@ var _require = require('validator');
 const isEmail = _require.isEmail;
 
 
-module.exports = (str, _ref) => {
-  let allowDisplayName = _ref.allowDisplayName;
-  let allowUtf8LocalPart = _ref.allowUtf8LocalPart;
-  let requireTld = _ref.requireTld;
+module.exports = function (str) {
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-  return isEmail(str, {
-    allow_display_name: allowDisplayName,
-    allow_utf8_local_part: allowUtf8LocalPart,
-    require_tld: requireTld
-  });
+  var _ref$allowDisplayName = _ref.allowDisplayName;
+  let allowDisplayName = _ref$allowDisplayName === undefined ? false : _ref$allowDisplayName;
+  var _ref$allowUtf8LocalPa = _ref.allowUtf8LocalPart;
+  let allowUtf8LocalPart = _ref$allowUtf8LocalPa === undefined ? false : _ref$allowUtf8LocalPa;
+  var _ref$requireTld = _ref.requireTld;
+  let requireTld = _ref$requireTld === undefined ? true : _ref$requireTld;
+
+  if (typeof str === 'string') {
+    return isEmail(str, {
+      allow_display_name: allowDisplayName,
+      allow_utf8_local_part: allowUtf8LocalPart,
+      require_tld: requireTld
+    });
+  } else {
+    return false;
+  }
 };

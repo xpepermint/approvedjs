@@ -1,23 +1,17 @@
-const {Approval} = require('../..');
-
-let approval = new Approval();
+const validator = require('../contains');
 
 describe('contains', () => {
 
-  it('fails when string does not contain the provided seed', async () => {
-    try {
-      await approval.validateInput({
-        description: 'my fake description'
-      }, [{
-        path: 'description',
-        validator: 'contains',
-        options: {seed: 'hello'},
-        message: 'must contain the `hello` word'
-      }]);
-      expect(false).toEqual(true);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'description', message: 'must contain the `hello` word'}]);
-    }
+  it('fails when not a string', async () => {
+    expect(validator(true, {seed: 'true'})).toEqual(false);
+  });
+
+  it('fails when not containing the provided seed', async () => {
+    expect(validator('my fake2 description', {seed: 'black'})).toEqual(false);
+  });
+
+  it('passes when containing the provided seed', async () => {
+    expect(validator('my fake description', {seed: 'fake'})).toEqual(true);
   });
 
 });

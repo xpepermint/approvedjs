@@ -1,22 +1,21 @@
-const {Approval} = require('../..');
-
-let approval = new Approval();
+const validator = require('../isAbsent');
 
 describe('isAbsent', () => {
 
-  it('fails unless value is blank', async () => {
-    try {
-      await approval.validateInput({
-        name: 'John'
-      }, [{
-        path: 'name',
-        validator: 'isAbsent',
-        message: 'must be blank'
-      }]);
-      expect(false).toEqual(true);
-    } catch(err) {
-      expect(err.errors).toEqual([{path: 'name', message: 'must be blank'}]);
-    }
+  it('fails when not blank', async () => {
+    expect(validator('text')).toEqual(false);
+  });
+
+  it('passes when null', async () => {
+    expect(validator(null)).toEqual(true);
+  });
+
+  it('passes when undefined', async () => {
+    expect(validator()).toEqual(true);
+  });
+
+  it('passes when blank', async () => {
+    expect(validator('')).toEqual(true);
   });
 
 });
