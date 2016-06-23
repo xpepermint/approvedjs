@@ -498,13 +498,35 @@ let handler = {
 
 You can completely customize how this module behaves by overriding the instance public methods or by defining your custom validators (check the source code for more).
 
-### Custom Validator
+### Custom Type
 
-All you need to do to create your custom validator is to define your custom method on the `approval.validators` object.
+To create a custom data type, define a custom method on the `approval.types` object which parses the input value.
 
 ```js
-import {Approval} from 'approved';
+let approval = new Approval();
 
+approval.types.cooltype = (value, options) => {
+  return `cool-${value}`; // not a very smart example :)
+};
+```
+
+### Custom Modifier
+
+To create a custom data modifier, define a custom method on the `approval.modifiers` object.
+
+```js
+let approval = new Approval();
+
+approval.types.coolerize = (value, options) => {
+  return `cool-${value}`; // not a very smart example :)
+};
+```
+
+### Custom Validator
+
+To create a custom validator, define your custom method on the `approval.validators` object.
+
+```js
 let approval = new Approval();
 
 approval.validators.isCool = (value, options) => {

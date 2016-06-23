@@ -34,12 +34,12 @@ exports.ValidationError = ValidationError;
 class Approval {
 
   constructor() {
-    this.typecasts = {
-      boolean: require('./typecasts/boolean'),
-      date: require('./typecasts/date'),
-      float: require('./typecasts/float'),
-      integer: require('./typecasts/integer'),
-      string: require('./typecasts/string')
+    this.types = {
+      boolean: require('./types/boolean'),
+      date: require('./types/date'),
+      float: require('./types/float'),
+      integer: require('./types/integer'),
+      string: require('./types/string')
     };
     this.modifiers = {
       squish: require('./modifiers/squish'),
@@ -92,7 +92,7 @@ class Approval {
 
         let modifierNames = reader.modifiers || [];
 
-        let typecast = _this.typecasts[type];
+        let typecast = _this.types[type];
         if (!typecast) {
           throw new Error(`Unknown type ${ type }`);
         }
