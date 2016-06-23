@@ -15,6 +15,18 @@ export class ValidationError extends ExtendableError {
 export class Approval {
 
   constructor() {
+    this.typecasts = {
+      boolean: require('./typecasts/boolean'),
+      date: require('./typecasts/date'),
+      float: require('./typecasts/float'),
+      integer: require('./typecasts/integer'),
+      string: require('./typecasts/string'),
+    };
+    this.modifiers = {
+      squish: require('./modifiers/squish'),
+      toLowerCase: require('./modifiers/toLowerCase'),
+      toUpperCase: require('./modifiers/toUpperCase'),
+    };
     this.validators = {
       contains: require('./validators/contains'),
       isAbsent: require('./validators/isAbsent'),
@@ -43,6 +55,38 @@ export class Approval {
       isValid: require('./validators/isValid'),
       matches: require('./validators/matches'),
     };
+  }
+
+  async filterInput(input, readers, options={}) {
+    let data = {};
+
+    for (let reader of readers) {
+      let {path, type} = reader;
+      let modifierNames = reader.modifiers || [];
+
+      let typecast = this.typecasts[type];
+      if (!typecast) {
+        throw new Error(`Unknown type ${type}`);
+      }
+
+      let value = typecast(dottie.get(input, path, null));
+      if (typeof value === 'undefined') {
+        continue;
+      }
+
+      for (let modifierName of modifierNames) {
+        let modifier = this.modifiers[modifierName];
+        if (!modifier) {
+          throw new Error(`Unknown modifier ${modifierName}`);
+        }
+
+        value = await modifier(value);
+      }
+
+      data[path] = value;
+    }
+
+    return dottie.transform(data);
   }
 
   async showValidationError(errors, options={}) {

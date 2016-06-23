@@ -28,6 +28,8 @@ Continue reading to see how this package is supposed to be used.
 
 ## Usage
 
+### Validation & Error Handling
+
 Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we will validate an input and create a new document in a database. If something will go wrong, an error will be catched and parsed into a user-friendly format.
 
 To make things as clean as possible, we'll use [Babel](https://babeljs.io/) with ES7 features and thus we will be able to wrap our code into the `async` block.
@@ -136,6 +138,30 @@ When this code is executed for the second time the `errors` variable will contai
 
 **NOTE:** It's a good practice to put validations and handlers into a separated file inside the `./approvals` directory which exposes `validations` and `handlers` variables.
 
+### Input Filters
+
+In most cases we deal with data objects thus type casting isn't needed. However, in some cases we need to extract certain keys into a new object. In some cases we need to cast values to a certain data type.
+
+Approved.js includes a method called `filterInput` which allows for filtering input against a list of  filters we provide. This is great for cases where we need to save an object to a database thus we can first filter out unknown keys, modify object values and then safely insert data into the database.
+
+Let's first define `filters` for our input object.
+
+```js
+const filters = [
+  {
+    path: 'firstName',
+    type: 'string',
+    modifiers: ['squish']
+  }
+];
+```
+
+Then somewhere in our code we filter the input object.
+
+```js
+let data = await approval.filterInput(input, filters); // -> {firstName: "John"}
+```
+
 ## API
 
 The core of this package represents the `Approval` class.
@@ -148,6 +174,25 @@ const approval = new Approval();
 
 ### Instance Methods
 
+### approval.filterInput(input, filters);
+
+> Filters data object against the provided filters and returns a new object containing only keys defined by the filters. Object values are modified by the provided modifiers and cast to the desired data type.
+
+| Arguments | Type | Required | Description
+|-----------|------|----------|------------
+| input | Object | Yes | Data object with keys to be filtered.
+| filters | Array | Yes | List of filter objects.
+
+```js
+await filterInput({
+  name: 'John Smith'
+}, [{
+  path: 'name',
+  type: 'string',
+  modifiers: ['squish']
+}]);
+```
+
 #### approval.validateInput(input, validations);
 
 > Validates data object against the provided validations and throws a ValidationError if at least one key value is not valid.
@@ -158,13 +203,13 @@ const approval = new Approval();
 | validations | Array | Yes | List of validation objects.
 
 ```js
-validateInput({
+await validateInput({
   name: 'John Smith'
 }, [{
   path: 'name',
   validator: 'isPresent',
   message: 'must be present'
-}])
+}]);
 ```
 
 #### approval.handleError(error, handlers);
@@ -180,13 +225,47 @@ validateInput({
 try {
   throw new Error('Fake error');
 } catch(err) {
-  let errors = handleError(err, [{
+  let errors = await handleError(err, [{
     path: 'base',
     error: 'Error',
     message: 'something went wrong'
   }]);
 }
 ```
+
+### Filters
+
+Filter object defines how a value of an input object key is casted and filtered by the `filterInput` method.
+
+| Key | Type | Required | Description
+|-----|------|----------|------------
+| path | String | Yes | Key name of an input object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
+| type | String | Yes | Data type name (possible values are `boolean`, `date`, `float`, `integer` or `string`).
+| modifiers | Array | No | List of modifiers.
+
+```js
+const filter = {
+  path: 'name',
+  type: 'string',
+  modifiers: ['squish']
+};
+```
+
+#### Modifiers
+
+Modifiers transform a value.
+
+##### squish
+
+> Returns whitespace on both ends of the string and changes remaining consecutive whitespace groups into one space each.
+
+##### toLowerCase
+
+> Converts characters in the string to lowercase.
+
+##### toUpperCase
+
+> Converts characters in the string to uppercase.
 
 ### Validations
 

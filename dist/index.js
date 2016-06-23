@@ -34,6 +34,18 @@ exports.ValidationError = ValidationError;
 class Approval {
 
   constructor() {
+    this.typecasts = {
+      boolean: require('./typecasts/boolean'),
+      date: require('./typecasts/date'),
+      float: require('./typecasts/float'),
+      integer: require('./typecasts/integer'),
+      string: require('./typecasts/string')
+    };
+    this.modifiers = {
+      squish: require('./modifiers/squish'),
+      toLowerCase: require('./modifiers/toLowerCase'),
+      toUpperCase: require('./modifiers/toUpperCase')
+    };
     this.validators = {
       contains: require('./validators/contains'),
       isAbsent: require('./validators/isAbsent'),
@@ -64,10 +76,51 @@ class Approval {
     };
   }
 
-  showValidationError(errors) {
-    var _arguments = arguments;
+  filterInput(input, readers) {
+    var _arguments = arguments,
+        _this = this;
+
     return _asyncToGenerator(function* () {
-      let options = _arguments.length <= 1 || _arguments[1] === undefined ? {} : _arguments[1];
+      let options = _arguments.length <= 2 || _arguments[2] === undefined ? {} : _arguments[2];
+
+      let data = {};
+
+      for (let reader of readers) {
+        let path = reader.path;
+        let type = reader.type;
+
+        let modifierNames = reader.modifiers || [];
+
+        let typecast = _this.typecasts[type];
+        if (!typecast) {
+          throw new Error(`Unknown type ${ type }`);
+        }
+
+        let value = typecast(_dottie2.default.get(input, path, null));
+        if (typeof value === 'undefined') {
+          continue;
+        }
+
+        for (let modifierName of modifierNames) {
+          let modifier = _this.modifiers[modifierName];
+          if (!modifier) {
+            throw new Error(`Unknown modifier ${ modifierName }`);
+          }
+
+          value = yield modifier(value);
+        }
+
+        data[path] = value;
+      }
+
+      return _dottie2.default.transform(data);
+    })();
+  }
+
+  showValidationError(errors) {
+    var _arguments2 = arguments;
+    return _asyncToGenerator(function* () {
+      let options = _arguments2.length <= 1 || _arguments2[1] === undefined ? {} : _arguments2[1];
 
       if (errors.length > 0) {
         throw new ValidationError(errors);
@@ -76,11 +129,11 @@ class Approval {
   }
 
   validateInput(input, validations) {
-    var _arguments2 = arguments,
-        _this = this;
+    var _arguments3 = arguments,
+        _this2 = this;
 
     return _asyncToGenerator(function* () {
-      let options = _arguments2.length <= 2 || _arguments2[2] === undefined ? {} : _arguments2[2];
+      let options = _arguments3.length <= 2 || _arguments3[2] === undefined ? {} : _arguments3[2];
 
       let errors = [];
 
@@ -90,7 +143,7 @@ class Approval {
 
         let validatorName = validation.validator;
 
-        let validator = _this.validators[validatorName];
+        let validator = _this2.validators[validatorName];
         if (!validator) {
           throw new Error(`Unknown validator ${ validatorName }`);
         }
@@ -102,14 +155,14 @@ class Approval {
         }
       }
 
-      return yield _this.showValidationError(errors, options);
+      return yield _this2.showValidationError(errors, options);
     })();
   }
 
   handleError(err, handlers) {
-    var _arguments3 = arguments;
+    var _arguments4 = arguments;
     return _asyncToGenerator(function* () {
-      let options = _arguments3.length <= 2 || _arguments3[2] === undefined ? {} : _arguments3[2];
+      let options = _arguments4.length <= 2 || _arguments4[2] === undefined ? {} : _arguments4[2];
 
       if (err instanceof ValidationError) {
         return err.errors;

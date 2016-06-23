@@ -8,7 +8,7 @@ const approval = new Approval();
 // adding custom validator
 approval.validators.isCool = require('./validators/isCool');
 // defining validations
-const {validations} = require('./approvals/user');
+const {validations, filters} = require('./approvals/user');
 
 /*
 * KOA HTTP server example.
@@ -20,12 +20,13 @@ const bodyParser = require('koa-bodyparser');
 const app = new Koa();
 app.use(bodyParser());
 // handling requests
-app.use(async (ctx, next) => {
+app.use(async (ctx) => {
   try {
-    await approval.validateInput(ctx.request.body, validations);
+    let data = await approval.filterInput(ctx.request.body, filters);
+    await approval.validateInput(data, validations);
     ctx.status = 200;
-    ctx.body = ctx.request.body;
-    console.log('Response:', ctx.request.body);
+    ctx.body = data;
+    console.log('Response:', data);
   } catch(err) {
     let errors = await approval.handleError(err);
     ctx.status = err.code;

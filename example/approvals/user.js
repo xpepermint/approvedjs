@@ -1,13 +1,16 @@
+exports.filters = [
+  {
+    path: 'name',
+    type: 'string',
+    modifiers: ['squish', 'toLowerCase']
+  }
+];
+
 exports.validations = [
   {
     path: 'name',
     validator: 'isPresent',
     message: 'must be present'
-  },
-  {
-    path: 'name',
-    validator: 'isCool',
-    message: 'must be cool'
   }
 ];
 
