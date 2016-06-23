@@ -61,7 +61,7 @@ export class Approval {
     let data = {};
 
     for (let reader of readers) {
-      let {path, type} = reader;
+      let {path, type, block} = reader;
       let modifierNames = reader.modifiers || [];
 
       let typecast = this.typecasts[type];
@@ -69,7 +69,7 @@ export class Approval {
         throw new Error(`Unknown type ${type}`);
       }
 
-      let value = typecast(dottie.get(input, path, null));
+      let value = typecast(dottie.get(input, path, null), options);
       if (typeof value === 'undefined') {
         continue;
       }
@@ -80,7 +80,11 @@ export class Approval {
           throw new Error(`Unknown modifier ${modifierName}`);
         }
 
-        value = await modifier(value);
+        value = await modifier(value, options);
+      }
+
+      if (block) {
+        value = await block(value, options);
       }
 
       data[path] = value;

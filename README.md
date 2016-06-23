@@ -151,7 +151,8 @@ const filters = [
   {
     path: 'firstName',
     type: 'string',
-    modifiers: ['squish']
+    modifiers: ['squish'],
+    block: (s) => `**${s}**`
   }
 ];
 ```
@@ -159,7 +160,7 @@ const filters = [
 Then somewhere in our code we filter the input object.
 
 ```js
-let data = await approval.filterInput(input, filters); // -> {firstName: "John"}
+let data = await approval.filterInput(input, filters); // -> {firstName: "**John**"}
 ```
 
 ## API
@@ -220,6 +221,7 @@ await validateInput({
 |-----------|------|----------|------------
 | error | Object | Yes | Error class instance or error object.
 | handlers | Array | Yes | List of handler objects.
+| options | Object | No | Filter settings.
 
 ```js
 try {
@@ -242,12 +244,14 @@ Filter object defines how a value of an input object key is casted and filtered 
 | path | String | Yes | Key name of an input object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
 | type | String | Yes | Data type name (possible values are `boolean`, `date`, `float`, `integer` or `string`).
 | modifiers | Array | No | List of modifiers.
+| block | Function | No | Synchronous or asynchronous resolver (e.g. `async (s) => s`)
 
 ```js
 const filter = {
   path: 'name',
   type: 'string',
-  modifiers: ['squish']
+  modifiers: ['squish'],
+  block: (s, o) => s
 };
 ```
 

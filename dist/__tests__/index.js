@@ -24,6 +24,43 @@ describe('filterInput', () => {
       name: 'John Smith'
     });
   }));
+
+  it('filters nested input', _asyncToGenerator(function* () {
+    expect((yield approval.filterInput({
+      user: {
+        name: ' John  Smith  ',
+        email: 'john@smith.com'
+      }
+    }, [{
+      path: 'user.name',
+      type: 'string',
+      modifiers: ['squish']
+    }]))).toEqual({
+      user: {
+        name: 'John Smith'
+      }
+    });
+  }));
+
+  it('filters input with block function', _asyncToGenerator(function* () {
+    expect((yield approval.filterInput({
+      name: 'John'
+    }, [{
+      path: 'name',
+      type: 'string',
+      block: (() => {
+        var ref = _asyncToGenerator(function* (s) {
+          return `**${ s }**`;
+        });
+
+        return function block(_x) {
+          return ref.apply(this, arguments);
+        };
+      })()
+    }]))).toEqual({
+      name: '**John**'
+    });
+  }));
 });
 
 describe('validateInput', () => {

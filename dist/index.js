@@ -88,6 +88,7 @@ class Approval {
       for (let reader of readers) {
         let path = reader.path;
         let type = reader.type;
+        let block = reader.block;
 
         let modifierNames = reader.modifiers || [];
 
@@ -96,7 +97,7 @@ class Approval {
           throw new Error(`Unknown type ${ type }`);
         }
 
-        let value = typecast(_dottie2.default.get(input, path, null));
+        let value = typecast(_dottie2.default.get(input, path, null), options);
         if (typeof value === 'undefined') {
           continue;
         }
@@ -107,7 +108,11 @@ class Approval {
             throw new Error(`Unknown modifier ${ modifierName }`);
           }
 
-          value = yield modifier(value);
+          value = yield modifier(value, options);
+        }
+
+        if (block) {
+          value = yield block(value, options);
         }
 
         data[path] = value;

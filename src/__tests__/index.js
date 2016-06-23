@@ -17,6 +17,35 @@ describe('filterInput', () => {
     })
   });
 
+  it('filters nested input', async () => {
+    expect(await approval.filterInput({
+      user: {
+        name: ' John  Smith  ',
+        email: 'john@smith.com'
+      }
+    }, [{
+      path: 'user.name',
+      type: 'string',
+      modifiers: ['squish']
+    }])).toEqual({
+      user: {
+        name: 'John Smith'
+      }
+    })
+  });
+
+  it('filters input with block function', async () => {
+    expect(await approval.filterInput({
+      name: 'John'
+    }, [{
+      path: 'name',
+      type: 'string',
+      block: async (s) => `**${s}**`
+    }])).toEqual({
+      name: '**John**'
+    })
+  });
+
 });
 
 describe('validateInput', () => {
