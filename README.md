@@ -1,5 +1,7 @@
 # New API Proposal
 
+## Defining Approval v1
+
 ```js
 exports.User = class extends Schema {
 
@@ -35,6 +37,52 @@ exports.User = class extends Schema {
 };
 ```
 
+## Defining Approval v2
+
+```js
+import {Schema} from 'approved';
+
+export class extends Schema {
+
+  constructor(input, context) {
+    this._input = input;
+    this._context = context;
+
+    this.addFilter('name', 'string', {modifiers: ['squish']});
+    // or
+    this.addFilter({
+      path: 'name',
+      type: 'string',
+      modifiers: ['squish', 'toLowerCase']
+    });
+
+    this.addValidator('name', 'isPresent', 'must be present');
+    // or
+    this.addValidator({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+
+    this.addHandler('system', 'Error', 'something went wrong', {code: 500});
+    // or
+    this.addHandler({
+      path: 'system',
+      error: 'Error',
+      options {code: 500, block: async (value) => true},
+      message: 'something went wrong'
+    });
+  }
+
+  async save() {
+    let res = await this.context.mongo.collection('user').insert(this.data);
+    return res.ops[0];
+  }
+};
+```
+
+## Usage v1
+
 ```js
 import {User} from 'approvals/user';
 
@@ -57,10 +105,6 @@ try {
   errors = await user.handle(err);
 }
 ```
-
-
-
-
 
 # approved.js
 
