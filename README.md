@@ -1,3 +1,67 @@
+# New API Proposal
+
+```js
+exports.User = class extends Schema {
+
+  static const filters = [
+    {
+      path: 'name',
+      type: 'string',
+      modifiers: ['squish', 'toLowerCase']
+    }
+  ];
+
+  static const validators = [
+    {
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    }
+  ];
+
+  static const handlers = [
+    {
+      path: 'system',
+      error: 'Error',
+      options {code: 500, block: async (value) => true},
+      message: 'something went wrong'
+    }
+  ];
+
+  async save() {
+    let res = await this.context.mongo.collection('user').insert(this.data);
+    return res.ops[0];
+  }
+};
+```
+
+```js
+import {User} from 'approvals/user';
+
+// creating an instance
+const user = new User({
+  name: 'John Smith',
+  email: 'john@smith.com'
+});
+
+// getters and setters
+let data = user.data;
+let context = user.context;
+
+// validating and executing a custom method
+let data, errors = null
+try {
+  await user.validate();
+  data = await user.save();
+} catch(err) {
+  errors = await user.handle(err);
+}
+```
+
+
+
+
+
 # approved.js
 
 > An elegant and intuitive way of synchronous and asynchronous data validation and error handling.
