@@ -31,8 +31,7 @@ exports.User = class extends Schema {
   ];
 
   async save() {
-    let res = await this.context.mongo.collection('user').insert(this.data);
-    return res.ops[0];
+    // custom code here
   }
 };
 ```
@@ -40,32 +39,88 @@ exports.User = class extends Schema {
 ## Defining Approval v2
 
 ```js
+exports.User = class extends Schema {
+
+  constructor(input, context) {
+    super(input, context);
+
+    this.filters = [
+      {
+        path: 'name',
+        type: 'string',
+        modifiers: ['squish', 'toLowerCase']
+      }
+    ];
+
+    this.validators = [
+      {
+        path: 'name',
+        validator: 'isPresent',
+        message: 'must be present'
+      }
+    ];
+
+    this.handlers = [
+      {
+        path: 'system',
+        error: 'Error',
+        options {code: 500, block: async (value) => true},
+        message: 'something went wrong'
+      }
+    ];
+  }
+
+  async save() {
+    // custom code here
+  }
+};
+```
+
+## Defining Approval v3
+
+```js
 import {Schema} from 'approved';
 
 export class extends Schema {
 
   constructor(input, context) {
-    this._input = input;
-    this._context = context;
+    super(input, context);
 
     this.addFilter('name', 'string', {modifiers: ['squish']});
-    // or
+
+    this.addValidation('name', 'isPresent', 'must be present');
+
+    this.addHandler('system', 'Error', 'something went wrong', {code: 500});
+  }
+
+  async save() {
+    // custom code here
+  }
+};
+```
+
+## Defining Approval v4 (preferred)
+
+```js
+import {Schema} from 'approved';
+
+export class extends Schema {
+
+  constructor(input, context) {
+    super(input, context);
+
     this.addFilter({
       path: 'name',
       type: 'string',
       modifiers: ['squish', 'toLowerCase']
     });
 
-    this.addValidator('name', 'isPresent', 'must be present');
-    // or
-    this.addValidator({
+    this.addValidation({
       path: 'name',
       validator: 'isPresent',
       message: 'must be present'
     });
 
-    this.addHandler('system', 'Error', 'something went wrong', {code: 500});
-    // or
     this.addHandler({
       path: 'system',
       error: 'Error',
@@ -75,13 +130,12 @@ export class extends Schema {
   }
 
   async save() {
-    let res = await this.context.mongo.collection('user').insert(this.data);
-    return res.ops[0];
+    // custom code here
   }
 };
 ```
 
-## Usage v1
+## Usage v1 (preferred)
 
 ```js
 import {User} from 'approvals/user';
@@ -92,10 +146,6 @@ const user = new User({
   email: 'john@smith.com'
 });
 
-// getters and setters
-let data = user.data;
-let context = user.context;
-
 // validating and executing a custom method
 let data, errors = null
 try {
@@ -103,6 +153,18 @@ try {
   data = await user.save();
 } catch(err) {
   errors = await user.handle(err);
+}
+```
+
+## Response v1 (preferred)
+
+```js
+{
+  data: null
+  errors: [
+    {path: 'name', message: 'must be present', kind: 'ValidationError'},
+    {path: 'system', message: 'something went wrong', kind: 'Error'}
+  ]
 }
 ```
 
