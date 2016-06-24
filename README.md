@@ -194,12 +194,17 @@ const schema = new Schema(input, context);
 
 ### Instance Methods
 
-
 #### schema.addFilter(filter)
+
+> Adds a filter to the list of filters.
 
 #### schema.addHandler(handler)
 
+> Adds a handler to the list of handlers.
+
 #### schema.addValidation(validation)
+
+> Adds a validation to the list of validations.
 
 #### schema.filter({strict});
 
@@ -219,21 +224,66 @@ const schema = new Schema(input, context);
 
 #### schema.removeFilterAtIndex(index)
 
+> Removes a filter from the list of filters.
+
 #### schema.removeHandlerAtIndex(index)
+
+> Removes a handler from the list of handlers.
 
 #### schema.removeValidationAtIndex(index)
 
+> Removes a validation from the list of validations.
+
 #### schema.setModifier(name, fn)
+
+> Registers a data modifier helper.
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| name | String | Yes | Type name.
+| fn | Function | Yes | Type cast method.
 
 #### schema.setType(name, fn)
 
+> Registers a data type method.
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| name | String | Yes | Type name.
+| fn | Function | Yes | Type method.
+
 #### schema.setValidator(name, fn)
+
+> Registers a validator.
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| name | String | Yes | Validator name.
+| fn | Function | Yes | Validator method.
 
 #### schema.unsetModifier(name)
 
+> Unregisters a data modifier helper.
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| name | String | Yes | Modifier name.
+
 #### schema.unsetType(name)
 
+> Unregisters a data type method.
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| name | String | Yes | Type name.
+
 #### schema.unsetValidator(name)
+
+> Unregisters a validator.
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| name | String | Yes | Validator name.
 
 #### schema.validate();
 
