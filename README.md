@@ -160,39 +160,46 @@ const schema = new Schema(input, context);
 
 ### Instance Variables
 
-#### schema.data
-
-> Holds an input data object.
-
 #### schema.context
 
 > Holds a context object.
 
-#### schema.types
+#### schema.data
 
-> Holds a list of defined data types.
-
-#### schema.modifiers
-
-> Holds a list of defined data modifiers.
-
-#### schema.validators
-
-> Holds a list of defined validators.
+> Holds an input data object.
 
 #### schema.filters
 
 > Holds a list of defined inout filters.
 
-#### schema.validations
-
-> Holds a list of defined validations.
-
 #### schema.handlers
 
 > Holds a list of defined error handlers.
 
+#### schema.modifiers
+
+> Holds a list of defined data modifiers.
+
+#### schema.types
+
+> Holds a list of defined data types.
+
+#### schema.validations
+
+> Holds a list of defined validations.
+
+#### schema.validators
+
+> Holds a list of defined validators.
+
 ### Instance Methods
+
+
+#### schema.addFilter(filter)
+
+#### schema.addHandler(handler)
+
+#### schema.addValidation(validation)
 
 #### schema.filter({strict});
 
@@ -202,10 +209,6 @@ const schema = new Schema(input, context);
 |-------|------|----------|---------|------------
 | strict | Boolean | No | Yes | Removes input object keys which are not defined by the filters when `true`.
 
-#### schema.validate();
-
-> Validates the data object against the validations provided by the `addValidation` method. It throws a `ValidationError` if an object is not valid.
-
 #### schema.handle(error);
 
 > Handles the provided Error object based on the provided handlers.
@@ -213,6 +216,28 @@ const schema = new Schema(input, context);
 | Param | Type | Required | Description
 |-------|------|----------|------------
 | error | Object | Yes | Error class instance or an error object.
+
+#### schema.removeFilterAtIndex(index)
+
+#### schema.removeHandlerAtIndex(index)
+
+#### schema.removeValidationAtIndex(index)
+
+#### schema.setModifier(name, fn)
+
+#### schema.setType(name, fn)
+
+#### schema.setValidator(name, fn)
+
+#### schema.unsetModifier(name)
+
+#### schema.unsetType(name)
+
+#### schema.unsetValidator(name)
+
+#### schema.validate();
+
+> Validates the data object against the validations provided by the `addValidation` method. It throws a `ValidationError` if an object is not valid.
 
 ### Filters
 
@@ -512,6 +537,10 @@ schema.setValidator('isCool', async (value, context) => {
   return str === 'cool'; // not a very smart example :)
 });
 ```
+
+## Contribute
+
+Let's make this package even better. Please contribute!
 
 ## License (MIT)
 
