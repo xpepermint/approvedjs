@@ -1,7 +1,7 @@
 {
   "name": "approved",
   "version": "1.0.0",
-  "description": "An elegant and intuitive way of synchronous and asynchronous data validation and error handling.",
+  "description": "Schema-based data filtering, validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
     "clean": "rm -Rf dist",

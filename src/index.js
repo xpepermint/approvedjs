@@ -168,7 +168,7 @@ export class Schema {
     return this;
   }
 
-  async filter(strict=true) {
+  async filter({strict=true}={}) {
     let data = strict ? {} : Object.assign({}, this._data);
 
     for (let filter of this.filters) {
@@ -232,7 +232,7 @@ export class Schema {
     }
   }
 
-  async handle(err, emptyFn=null) {
+  async handle(err) {
     let errors = [];
 
     if (err instanceof ValidationError) {
@@ -268,12 +268,6 @@ export class Schema {
       }
     }
 
-    if (errors.length > 0) {
-      return errors;
-    } else if (emptyFn) {
-      return emptyFn(err, this.context);
-    } else {
-      return undefined;
-    }
+    return errors;
   }
 }

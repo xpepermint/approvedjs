@@ -190,11 +190,14 @@ class Schema {
   }
 
   filter() {
-    var _arguments = arguments,
-        _this = this;
+    var _this = this,
+        _arguments = arguments;
 
     return _asyncToGenerator(function* () {
-      let strict = _arguments.length <= 0 || _arguments[0] === undefined ? true : _arguments[0];
+      var _ref = _arguments.length <= 0 || _arguments[0] === undefined ? {} : _arguments[0];
+
+      var _ref$strict = _ref.strict;
+      let strict = _ref$strict === undefined ? true : _ref$strict;
 
       let data = strict ? {} : Object.assign({}, _this._data);
 
@@ -270,12 +273,9 @@ class Schema {
   }
 
   handle(err) {
-    var _arguments2 = arguments,
-        _this3 = this;
+    var _this3 = this;
 
     return _asyncToGenerator(function* () {
-      let emptyFn = _arguments2.length <= 1 || _arguments2[1] === undefined ? null : _arguments2[1];
-
       let errors = [];
 
       if (err instanceof ValidationError) {
@@ -315,13 +315,7 @@ class Schema {
         }
       }
 
-      if (errors.length > 0) {
-        return errors;
-      } else if (emptyFn) {
-        return emptyFn(err, _this3.context);
-      } else {
-        return undefined;
-      }
+      return errors;
     })();
   }
 }

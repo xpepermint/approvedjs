@@ -1,229 +1,8 @@
-# New API Proposal
-
-## Defining Approval v1 (no)
-
-**WHY NOT?**: Exposing objects like this is cool but not a safe way. You are
-forced to define filters on the class.
-
-```js
-exports.User = class extends Schema {
-
-  static const filters = [
-    {
-      path: 'name',
-      type: 'string',
-      modifiers: ['squish', 'toLowerCase']
-    }
-  ];
-
-  static const validators = [
-    {
-      path: 'name',
-      validator: 'isPresent',
-      message: 'must be present'
-    }
-  ];
-
-  static const handlers = [
-    {
-      path: 'system',
-      error: 'Error',
-      options {code: 500, block: async (value) => true},
-      message: 'something went wrong'
-    }
-  ];
-
-  async save() {
-    // custom code here
-  }
-};
-```
-
-## Defining Approval v2 (no)
-
-**WHY NOT?**: Exposing objects like this is cool but not a safe way.
-
-```js
-exports.User = class extends Schema {
-
-  constructor(input, context) {
-    super(input, context);
-
-    this.filters = [
-      {
-        path: 'name',
-        type: 'string',
-        modifiers: ['squish', 'toLowerCase']
-      }
-    ];
-
-    this.validators = [
-      {
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }
-    ];
-
-    this.handlers = [
-      {
-        path: 'system',
-        error: 'Error',
-        options {code: 500, block: async (value) => true},
-        message: 'something went wrong'
-      }
-    ];
-  }
-
-  async save() {
-    // custom code here
-  }
-};
-```
-
-## Defining Approval v3 (no)
-
-**WHY NOT?**: Not the right way beacuse a method have more then 3 arguments. It's
-also not aesthetic.
-
-```js
-import {Schema} from 'approved';
-
-export class extends Schema {
-
-  constructor(input, context) {
-    super(input, context);
-
-    this.addFilter('name', 'string', {modifiers: ['squish']});
-
-    this.addValidation('name', 'isPresent', 'must be present');
-
-    this.addHandler('system', 'Error', 'something went wrong', {code: 500});
-  }
-
-  async save() {
-    // custom code here
-  }
-};
-```
-
-## Defining Approval v4 (yes)
-
-Schema can be extended and used as a model class.
-
-```js
-import {Schema} from 'approved';
-
-export class User extends Schema {
-
-  constructor(input, context) {
-    super(input, context);
-
-    this.addFilter({
-      path: 'name',
-      type: 'string',
-      modifiers: ['squish', 'toLowerCase']
-    });
-
-    this.addValidation({
-      path: 'name',
-      validator: 'isPresent',
-      message: 'must be present'
-    });
-
-    this.addHandler({
-      path: 'system',
-      error: 'Error',
-      options {code: 500, block: async (value) => true},
-      message: 'something went wrong'
-    });
-  }
-
-  async save() {
-    // custom code here
-  }
-};
-```
-
-We can use it without extending the class.
-
-```js
-import {Schema} from 'approved';
-
-let schema = new Schema({
-  name: 'John Smith',
-  email: 'john@smith.com'
-});
-
-schema.addFilter({
-  path: 'name',
-  type: 'string',
-  modifiers: ['squish', 'toLowerCase']
-});
-
-schema.addValidation({
-  path: 'name',
-  validator: 'isPresent',
-  message: 'must be present'
-});
-
-schema.addHandler({
-  path: 'system',
-  error: 'Error',
-  options {code: 500, block: async (value) => true},
-  message: 'something went wrong'
-});
-
-```
-
-## Usage v1 (yes)
-
-```js
-import {User} from 'approvals/user';
-
-// creating an instance
-const user = new User({
-  name: 'John Smith',
-  email: 'john@smith.com'
-});
-
-// validating and executing a custom method
-let data, errors = null
-try {
-  await user.filter(); // not required (don't have to be inside try/catch block)
-  await user.validate(); // not required
-  data = await user.save(); // executing a custom method
-} catch(err) {
-  errors = await user.handle(err, (err, ctx) => null)); // return [] on unhandled error (default is null)
-  if (!errors) throw err;
-}
-```
-
-## Response v1 (yes)
-
-```js
-{
-  data: null,
-  errors: [
-    {
-      path: 'name',
-      message: 'must be present',
-      kind: 'ValidationError'
-    },
-    {
-      path: 'system',
-      message: 'something went wrong',
-      kind: 'Error'
-    }
-  ]
-}
-```
-
 # approved.js
 
-> An elegant and intuitive way of synchronous and asynchronous data validation and error handling.
+> Schema-based data filtering, validation and error handling.
 
-Approved.js provides methods for synchronous and asynchronous validation of complex javascript objects and error handling, with unified output error message format.
+Approved.js allows for filtering and validating complex javascript objects and error handling. It has a simple, unified and beautiful API with a full asynchronous support.
 
 It is an open source package. The [source code](https://github.com/xpepermint/approvedjs) is available on GitHub where you can also find our [issue tracker](https://github.com/xpepermint/approvedjs/issues).
 
@@ -233,7 +12,7 @@ It is an open source package. The [source code](https://github.com/xpepermint/ap
 
 We often write code which validates input data and handles errors. We do it when we write API controllers, GraphQL mutations, before we try to write something into a database and in many other cases where we manipulate and mutate data.
 
-Its pretty unusual that there is no broadly accepted best practice for writing a common logic like this in Javascript. Every time you start writing validations, you ask yourself the same questions, you try hard finding the best way to get a clean and beautiful solution. At the end you desperately start googling for answers, searching best practices and possible conventions. If you are honest you'll admit that all commonly known solutions are rather complex or ugly.
+Every time you start writing validations, you ask yourself the same questions. You try hard finding the best way to get a clean and beautiful solution. At the end you desperately start googling for answers, searching best practices and possible conventions.
 
 We need to write a clean and beautiful code to keep our projects long-term sustainable. Validation happens before actual action and error handling happens afterwords. That's why validation and error handling go hand in hand. Approved.js has been written with that in mind.
 
@@ -249,9 +28,7 @@ Continue reading to see how this package is supposed to be used.
 
 ## Usage
 
-### Validation & Error Handling
-
-Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we will validate an input and create a new document in a database. If something will go wrong, an error will be catched and parsed into a user-friendly format.
+Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we will filter and validate an input and then create a new document in a database. If something will go wrong, an error will be handled and parsed into a user-friendly format.
 
 To make things as clean as possible, we'll use [Babel](https://babeljs.io/) with ES7 features and thus we will be able to wrap our code into the `async` block.
 
@@ -267,36 +44,61 @@ For the purpose of this tutorial let's first define an imaginary input object wh
 const input = {
   firstName: 'John',
   lastName: 'Smith',
-  email: 'john@smith.com'
+  email: 'John@Smith.com'
 }
 ```
 
-Instantiate the main `Approval` class.
+Next, let's create a simple schema for the input data above.
 
 ```js
-import {Approval} from 'approved';
+import {Schema} from 'approved';
 
-let approval = new Approval();
+let schema = new Schema(input);
 ```
 
-Continue by defining a sequence of validations for the `firstName` field.
+Optionally we can filter input data and extract only the paths defined by filters.
 
 ```js
-const validations = [
-  {
-    path: 'firstName',
-    validator: 'isPresent',
-    message: 'must be present'
-  }, {
-    path: 'firstName',
-    validator: 'isLength',
-    options: {min: 2, max: 50},
-    message: 'can be between 2 and 50'
-  }
-];
+schema.addFilter({
+  path: 'email',
+  type: 'string',
+  modifiers: ['squish', 'toLowerCase']
+});
+
+await schema.filter();
 ```
 
-To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) for storing data, with a unique index on the `firstName` field, named `uniqueFirstName`. This will trigger the `E11000` error when the code will be executed for the second time. How to use the MongoDB driver and how to [create a unique indexe](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure this yourself.
+We first define a filter and then call the `filter` method to extract, cast and modify the input object. After the `filter` method call the `schema.data` holds only the email field.
+
+Let's continue by adding validations. We need to verify the email before we store it to the database.
+
+```js
+schema.addValidation({
+  path: 'name',
+  validator: 'isPresent',
+  message: 'must be present'
+});
+
+try {
+  await schema.validate();
+} catch(e) {
+  // validation failed
+}
+```
+
+Similar to filters, we first add validations and then execture the `validate` method to verify previously filtered input object. If validation fails the method throws the `ValidationError`. Let's update the try/catch block above by adding the error handling logic.
+
+```js
+let errors = null;
+try {
+  await schema.validate();
+} catch(e) {
+  errors = await user.handle(err);
+  if (!errors) throw err; // unhandled error
+}
+```
+
+To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) for storing data, with a unique index on the `email` field, named `uniqueEmail`. This will trigger the `E11000` error when the code is executed for the second time. How to use the MongoDB driver and how to [create a unique indexe](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure that yourself.
 
 ```js
 import {MongoClient} from 'mongodb';
@@ -304,161 +106,83 @@ import {MongoClient} from 'mongodb';
 const mongo = await MongoClient.connect('mongodb://localhost:27017/approved');
 ```
 
-To catch and handle errors we need to define a sequence of handlers which tell how errors are handled. Note that the `ValidationError` handler is defined by default. Let's set an additional handler for handling uniqueness constraint which we defined earlier. We'll use the [mongo-error-parser](https://github.com/xpepermint/mongo-error-parser) package for parsing MongoError message (don't forget to install it).
+The `handle` method handles the `ValidationError` by default. To handle the `MongoError`, we need to define a handler. Here we also use the [mongo-error-parser](https://github.com/xpepermint/mongo-error-parser) helper for parsing MongoError message (don't forget to install it).
 
 ```js
 import mongoParser from 'mongo-error-parser';
 
-const handlers = [
-  {
-    path: 'firstName',
-    error: 'MongoError',
-    options: {
-      code: 11000,
-      block: async (err) => mongoParser(err).index === 'uniqueFirstName'
-    }
-    message: 'is already taken'
-  }
-];
+schema.addHandler({
+  path: 'email',
+  error: 'MongoError',
+  options: {
+    code: 11000,
+    block: async (err) => mongoParser(err).index === 'uniqueEmail'
+  },
+  message: 'is already taken'
+});
 ```
 
-Add a try/catch block which validates input data, saves data to the database and catches errors.
+We can now update the try/catch block defined earlier with a logic for storing input data to the database.
 
 ```js
-const {validateInput, handleError} = approval;
-
-let result, errors = null;
+let errors, data = null;
 try {
-  // validating input data
-  await validateInput(input, validations);
-  // saving input object the the database
-  result = await mongo.collection('users').insertOne(input);
-} catch(err) {
-  // handling validation and other errors
-  errors = await handleError(err, handlers);
-  // raising when unhandled error
-  if (!errors) throw err;
-}
-// display result/errors
-console.log({result, errors});
-```
-
-When this code is executed for the second time the `errors` variable will contain an error message in the same format as validation error messages. This is great because your server can directly respond with this user-friendly information.
-
-```json
-{
-  "result": null,
-  "errors": [
-    {
-      "path": "firstName",
-      "message": "is already taken"
-    }
-  ]
+  await schema.validate();
+  data = await mongo.collection('users').insertOne(schema.data);
+} catch(e) {
+  errors = await user.handle(err);
+  if (!errors) throw err; // unhandled error
 }
 ```
 
-**NOTE:** It's a good practice to put validations and handlers into a separated file inside the `./approvals` directory which exposes `validations` and `handlers` variables.
-
-### Input Filters
-
-In most cases we deal with data objects thus type casting isn't needed. However, in some cases we need to extract certain keys into a new object. In some cases we also need to cast values to a certain data type.
-
-Approved.js includes a method called `filterInput` which allows for filtering input against a list of  filters we provide. This is great for cases where we need to save an object to a database thus we can first filter out unknown keys, modify object values and then safely insert data into a database.
-
-Let's first define `filters` for our input object.
+That's it. We can now show a well structured data object.
 
 ```js
-const filters = [
-  {
-    path: 'firstName',
-    type: 'string',
-    modifiers: ['squish'],
-    block: (s) => `**${s}**`
-  }
-];
+console.log({data, errors});
 ```
 
-Then somewhere in our code we filter the input object.
-
-```js
-let data = await approval.filterInput(input, filters); // -> {firstName: "**John**"}
-```
+Note that it's a good practice to extend the Schema class and place it into a separated file inside the `./approvals` directory. See the included example (`npm run example`) and the source code for more.
 
 ## API
 
-The core of this package represents the `Approval` class.
+The core of this package represents the `Schema` class.
 
 ```js
-import {Approval} from 'approved';
+import {Schema} from 'approved';
 
-const approval = new Approval();
+const schema = new Schema(input, context);
 ```
+
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| input | Object | Yes | Input data object.
+| context | Object | No | Context object which is passed into each filter, validation and handler.
 
 ### Instance Methods
 
-### approval.filterInput(input, filters);
+### schema.filter({strict});
 
-> Filters data object against the provided filters and returns a new object containing only keys defined by the filters. Object values are modified by the provided modifiers and cast to the desired data type.
+> Filters an input object against the filters provided by the `addFilter` method.
 
-| Arguments | Type | Required | Description
-|-----------|------|----------|------------
-| input | Object | Yes | Data object with keys to be filtered.
-| filters | Array | Yes | List of filter objects.
+| Param | Type | Required | Default | Description
+|-------|------|----------|---------|------------
+| strict | Boolean | No | Yes | Removes input object keys which are not defined by the filters when `true`.
 
-```js
-await filterInput({
-  name: 'John Smith'
-}, [{
-  path: 'name',
-  type: 'string',
-  modifiers: ['squish']
-}]);
-```
+#### schema.validate();
 
-#### approval.validateInput(input, validations);
+> Validates the data object against the validations provided by the `addValidation` method. It throws a `ValidationError` if an object is not valid.
 
-> Validates data object against the provided validations and throws a ValidationError if at least one key value is not valid.
-
-| Arguments | Type | Required | Description
-|-----------|------|----------|------------
-| input | Object | Yes | Data object with keys to be validated.
-| validations | Array | Yes | List of validation objects.
-
-```js
-await validateInput({
-  name: 'John Smith'
-}, [{
-  path: 'name',
-  validator: 'isPresent',
-  message: 'must be present'
-}]);
-```
-
-#### approval.handleError(error, handlers);
+#### schema.handle(error);
 
 > Handles the provided Error object based on the provided handlers.
 
-| Arguments | Type | Required | Description
-|-----------|------|----------|------------
-| error | Object | Yes | Error class instance or error object.
-| handlers | Array | Yes | List of handler objects.
-| options | Object | No | Filter settings.
-
-```js
-try {
-  throw new Error('Fake error');
-} catch(err) {
-  let errors = await handleError(err, [{
-    path: 'base',
-    error: 'Error',
-    message: 'something went wrong'
-  }]);
-}
-```
+| Param | Type | Required | Description
+|-------|------|----------|------------
+| error | Object | Yes | Error class instance or an error object.
 
 ### Filters
 
-Filter object defines how a value of an input object key is casted and filtered by the `filterInput` method.
+Filter object defines how a value of an input object key is casted and filtered by the `filter` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
@@ -478,7 +202,7 @@ const filter = {
 
 #### Modifiers
 
-Modifiers transform a value.
+Modifiers transform a value and are used by filters.
 
 ##### squish
 
@@ -494,7 +218,7 @@ Modifiers transform a value.
 
 ### Validations
 
-Validation object defines how a value of an input object key is validated by the `validateInput` method.
+Validation object defines how a value of an input object key is validated by the `validate` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
@@ -697,7 +421,7 @@ let validation = {
 
 ### Handlers
 
-Handler object defines how an error is handled by the `handleError` method.
+Handler object defines how an error is handled by the `handle` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
@@ -717,50 +441,42 @@ let handler = {
 
 ## Advanced Usage
 
-You can completely customize how this module behaves by overriding the instance public methods or by defining your custom validators (check the source code for more).
+You can customize how this module behaves by extending the Schema class or by just defining your custom types, modifiers and validators (check the source code for more).
 
 ### Custom Type
 
-To create a custom data type, define a custom method on the `approval.types` object which parses the input value.
+Use the `setType` method to define a custom data type.
 
 ```js
-let approval = new Approval();
+let schema = new Schema();
 
-approval.types.cooltype = (value, options) => {
+schema.setType('cooltype', (value, context) => {
   return `cool-${value}`; // not a very smart example :)
-};
+});
 ```
 
 ### Custom Modifier
 
-To create a custom data modifier, define a custom method on the `approval.modifiers` object.
+Use the `setModifier` method to define a custom data modifier.
 
 ```js
-let approval = new Approval();
+let schema = new Schema();
 
-approval.types.coolerize = (value, options) => {
+schema.setModifier('coolerize', (value, context) => {
   return `cool-${value}`; // not a very smart example :)
-};
+});
 ```
 
 ### Custom Validator
 
-To create a custom validator, define your custom method on the `approval.validators` object.
+Use the `setValidator` method to define a custom validator.
 
 ```js
-let approval = new Approval();
+let schema = new Schema();
 
-approval.validators.isCool = (value, options) => {
-  return str === 'cool';
-};
-
-validateInput({
-  word: 'cool'
-}, [{
-  path: 'word',
-  validator: 'isCool',
-  message: 'must be cool'
-}]);
+schema.setValidator('isCool', async (value, context) => {
+  return str === 'cool'; // not a very smart example :)
+});
 ```
 
 ## License (MIT)
