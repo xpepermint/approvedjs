@@ -2,7 +2,7 @@
 
 > Schema-based data filtering, validation and error handling.
 
-Approved.js allows for filtering and validating complex javascript objects and error handling. It has a simple, unified and beautiful API with a full asynchronous support.
+Approved.js allows for filtering and validating complex javascript objects and error handling. It has a simple, unified and beautiful API with a support for asynchronous processing.
 
 It is an open source package. The [source code](https://github.com/xpepermint/approvedjs) is available on GitHub where you can also find our [issue tracker](https://github.com/xpepermint/approvedjs/issues).
 
@@ -158,9 +158,43 @@ const schema = new Schema(input, context);
 | input | Object | Yes | Input data object.
 | context | Object | No | Context object which is passed into each filter, validation and handler.
 
+### Instance Variables
+
+#### schema.data
+
+> Holds an input data object.
+
+#### schema.context
+
+> Holds a context object.
+
+#### schema.types
+
+> Holds a list of defined data types.
+
+#### schema.modifiers
+
+> Holds a list of defined data modifiers.
+
+#### schema.validators
+
+> Holds a list of defined validators.
+
+#### schema.filters
+
+> Holds a list of defined inout filters.
+
+#### schema.validations
+
+> Holds a list of defined validations.
+
+#### schema.handlers
+
+> Holds a list of defined error handlers.
+
 ### Instance Methods
 
-### schema.filter({strict});
+#### schema.filter({strict});
 
 > Filters an input object against the filters provided by the `addFilter` method.
 
