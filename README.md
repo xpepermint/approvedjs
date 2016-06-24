@@ -114,7 +114,7 @@ Schema can be extended and used as a model class.
 ```js
 import {Schema} from 'approved';
 
-export class extends Schema {
+export class User extends Schema {
 
   constructor(input, context) {
     super(input, context);
@@ -194,7 +194,7 @@ try {
   await user.validate(); // not required
   data = await user.save(); // executing a custom method
 } catch(err) {
-  errors = await user.handle(err, (err) => null)); // return [] on unhandled error (default is null)
+  errors = await user.handle(err, (err, ctx) => null)); // return [] on unhandled error (default is null)
   if (!errors) throw err;
 }
 ```

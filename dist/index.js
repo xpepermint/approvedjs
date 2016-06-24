@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Approval = exports.ValidationError = undefined;
+exports.Schema = exports.ValidationError = undefined;
 
 var _es6Error = require('es6-error');
 
@@ -31,73 +31,186 @@ class ValidationError extends _es6Error2.default {
 }
 
 exports.ValidationError = ValidationError;
-class Approval {
+class Schema {
 
-  constructor() {
-    this.types = {
-      boolean: require('./types/boolean'),
-      date: require('./types/date'),
-      float: require('./types/float'),
-      integer: require('./types/integer'),
-      string: require('./types/string')
-    };
-    this.modifiers = {
-      squish: require('./modifiers/squish'),
-      toLowerCase: require('./modifiers/toLowerCase'),
-      toUpperCase: require('./modifiers/toUpperCase')
-    };
-    this.validators = {
-      contains: require('./validators/contains'),
-      isAbsent: require('./validators/isAbsent'),
-      isBase64: require('./validators/isBase64'),
-      isByteLength: require('./validators/isByteLength'),
-      isCreditCard: require('./validators/isCreditCard'),
-      isDate: require('./validators/isDate'),
-      isEmail: require('./validators/isEmail'),
-      isExcluded: require('./validators/isExcluded'),
-      isFQDN: require('./validators/isFQDN'),
-      isHexadecimal: require('./validators/isHexadecimal'),
-      isHexColor: require('./validators/isHexColor'),
-      isIncluded: require('./validators/isIncluded'),
-      isIP: require('./validators/isIP'),
-      isISBN: require('./validators/isISBN'),
-      isISIN: require('./validators/isISIN'),
-      isJSON: require('./validators/isJSON'),
-      isLength: require('./validators/isLength'),
-      isLowercase: require('./validators/isLowercase'),
-      isMACAddress: require('./validators/isMACAddress'),
-      isMongoId: require('./validators/isMongoId'),
-      isPresent: require('./validators/isPresent'),
-      isUppercase: require('./validators/isUppercase'),
-      isURL: require('./validators/isURL'),
-      isUUID: require('./validators/isUUID'),
-      isValid: require('./validators/isValid'),
-      matches: require('./validators/matches')
-    };
+  constructor(input) {
+    let context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+    this._input = input || {};
+    this._context = context;
+
+    this._data = Object.assign({}, input);
+    this._types = {};
+    this._modifiers = {};
+    this._validators = {};
+    this._filters = [];
+    this._validations = [];
+    this._handlers = [];
+
+    this.setType('boolean', require('./types/boolean'));
+    this.setType('date', require('./types/date'));
+    this.setType('float', require('./types/float'));
+    this.setType('integer', require('./types/integer'));
+    this.setType('string', require('./types/string'));
+
+    this.setModifier('squish', require('./modifiers/squish'));
+    this.setModifier('toLowerCase', require('./modifiers/toLowerCase'));
+    this.setModifier('toUpperCase', require('./modifiers/toUpperCase'));
+
+    this.setValidator('contains', require('./validators/contains'));
+    this.setValidator('isAbsent', require('./validators/isAbsent'));
+    this.setValidator('isBase64', require('./validators/isBase64'));
+    this.setValidator('isByteLength', require('./validators/isByteLength'));
+    this.setValidator('isCreditCard', require('./validators/isCreditCard'));
+    this.setValidator('isDate', require('./validators/isDate'));
+    this.setValidator('isEmail', require('./validators/isEmail'));
+    this.setValidator('isExcluded', require('./validators/isExcluded'));
+    this.setValidator('isFQDN', require('./validators/isFQDN'));
+    this.setValidator('isHexadecimal', require('./validators/isHexadecimal'));
+    this.setValidator('isHexColor', require('./validators/isHexColor'));
+    this.setValidator('isIncluded', require('./validators/isIncluded'));
+    this.setValidator('isIP', require('./validators/isIP'));
+    this.setValidator('isISBN', require('./validators/isISBN'));
+    this.setValidator('isISIN', require('./validators/isISIN'));
+    this.setValidator('isJSON', require('./validators/isJSON'));
+    this.setValidator('isLength', require('./validators/isLength'));
+    this.setValidator('isLowercase', require('./validators/isLowercase'));
+    this.setValidator('isMACAddress', require('./validators/isMACAddress'));
+    this.setValidator('isMongoId', require('./validators/isMongoId'));
+    this.setValidator('isPresent', require('./validators/isPresent'));
+    this.setValidator('isUppercase', require('./validators/isUppercase'));
+    this.setValidator('isURL', require('./validators/isURL'));
+    this.setValidator('isUUID', require('./validators/isUUID'));
+    this.setValidator('isValid', require('./validators/isValid'));
+    this.setValidator('matches', require('./validators/matches'));
   }
 
-  filterInput(input, readers) {
+  get data() {
+    return this._data;
+  }
+
+  get context() {
+    return this._context;
+  }
+
+  get types() {
+    return this._types;
+  }
+
+  get modifiers() {
+    return this._modifiers;
+  }
+
+  get validators() {
+    return this._validators;
+  }
+
+  get filters() {
+    return this._filters;
+  }
+
+  get validations() {
+    return this._validations;
+  }
+
+  get handlers() {
+    return this._handlers;
+  }
+
+  setType(name, fn) {
+    this._types[name] = fn;
+
+    return this;
+  }
+
+  setModifier(name, fn) {
+    this._modifiers[name] = fn;
+
+    return this;
+  }
+
+  setValidator(name, fn) {
+    this._validators[name] = fn;
+
+    return this;
+  }
+
+  unsetType(name) {
+    delete this._types[name];
+
+    return this;
+  }
+
+  unsetModifier(name) {
+    delete this._modifiers[name];
+
+    return this;
+  }
+
+  unsetValidator(name) {
+    delete this._validators[name];
+
+    return this;
+  }
+
+  addFilter(filter) {
+    this._filters.push(filter);
+
+    return this;
+  }
+
+  addValidation(validation) {
+    this._validations.push(validation);
+
+    return this;
+  }
+
+  addHandler(handler) {
+    this._handlers.push(handler);
+
+    return this;
+  }
+
+  removeFilterAtIndex(index) {
+    this._filters.splice(index, 1);
+
+    return this;
+  }
+
+  removeValidationAtIndex(index) {
+    this._validations.splice(index, 1);
+
+    return this;
+  }
+
+  removeHandlerAtIndex(index) {
+    this._handlers.splice(index, 1);
+
+    return this;
+  }
+
+  filter() {
     var _arguments = arguments,
         _this = this;
 
     return _asyncToGenerator(function* () {
-      let options = _arguments.length <= 2 || _arguments[2] === undefined ? {} : _arguments[2];
+      let strict = _arguments.length <= 0 || _arguments[0] === undefined ? true : _arguments[0];
 
-      let data = {};
+      let data = strict ? {} : Object.assign({}, _this._data);
 
-      for (let reader of readers) {
-        let path = reader.path;
-        let type = reader.type;
-        let block = reader.block;
+      for (let filter of _this.filters) {
+        let path = filter.path;
+        let type = filter.type;
+        let block = filter.block;
 
-        let modifierNames = reader.modifiers || [];
+        let modifierNames = filter.modifiers || [];
 
         let typecast = _this.types[type];
         if (!typecast) {
           throw new Error(`Unknown type ${ type }`);
         }
 
-        let value = typecast(_dottie2.default.get(input, path, null), options);
+        let value = typecast(_dottie2.default.get(_this._input, path, null), _this.context);
         if (typeof value === 'undefined') {
           continue;
         }
@@ -108,41 +221,29 @@ class Approval {
             throw new Error(`Unknown modifier ${ modifierName }`);
           }
 
-          value = yield modifier(value, options);
+          value = yield modifier(value, _this.context);
         }
 
         if (block) {
-          value = yield block(value, options);
+          value = yield block(value, _this.context);
         }
 
         data[path] = value;
       }
 
-      return _dottie2.default.transform(data);
+      _this._data = _dottie2.default.transform(data);
+
+      return _this;
     })();
   }
 
-  showValidationError(errors) {
-    var _arguments2 = arguments;
-    return _asyncToGenerator(function* () {
-      let options = _arguments2.length <= 1 || _arguments2[1] === undefined ? {} : _arguments2[1];
-
-      if (errors.length > 0) {
-        throw new ValidationError(errors);
-      }
-    })();
-  }
-
-  validateInput(input, validations) {
-    var _arguments3 = arguments,
-        _this2 = this;
+  validate() {
+    var _this2 = this;
 
     return _asyncToGenerator(function* () {
-      let options = _arguments3.length <= 2 || _arguments3[2] === undefined ? {} : _arguments3[2];
-
       let errors = [];
 
-      for (let validation of validations) {
+      for (let validation of _this2.validations) {
         let path = validation.path;
         let message = validation.message;
 
@@ -153,59 +254,75 @@ class Approval {
           throw new Error(`Unknown validator ${ validatorName }`);
         }
 
-        let value = _dottie2.default.get(input, path, null);
-        let isValid = yield validator(value, validation.options || {}, options || {});
+        let value = _dottie2.default.get(_this2.data, path, null);
+        let isValid = yield validator(value, validation.options || {}, _this2.context);
         if (!isValid) {
-          errors.push({ path, message });
+          errors.push({ path, message, kind: 'ValidationError' });
         }
       }
 
-      return yield _this2.showValidationError(errors, options);
+      if (errors.length > 0) {
+        throw new ValidationError(errors);
+      } else {
+        return _this2;
+      }
     })();
   }
 
-  handleError(err, handlers) {
-    var _arguments4 = arguments;
+  handle(err) {
+    var _arguments2 = arguments,
+        _this3 = this;
+
     return _asyncToGenerator(function* () {
-      let options = _arguments4.length <= 2 || _arguments4[2] === undefined ? {} : _arguments4[2];
+      let emptyFn = _arguments2.length <= 1 || _arguments2[1] === undefined ? null : _arguments2[1];
+
+      let errors = [];
 
       if (err instanceof ValidationError) {
-        return err.errors;
-      }
-
-      let handler = null;
-      for (let handlerCandidate of handlers) {
-        let handlerOptions = handlerCandidate.options || {};
-
-        if (!( // name
-        handlerCandidate.error === err.name || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error)) {
-          continue;
-        }
-
-        if (!( // code
-        typeof handlerOptions.code === 'undefined' || typeof handlerOptions.code !== 'undefined' && handlerOptions.code === err.code)) {
-          continue;
-        }
-
-        if (!( // block
-        typeof handlerOptions.block === 'undefined' || typeof handlerOptions.block !== 'undefined' && (yield handlerOptions.block(err, options)))) {
-          continue;
-        }
-
-        handler = handlerCandidate;
-        break;
-      }
-
-      if (handler) {
-        var _handler = handler;
-        let path = _handler.path;
-        let message = _handler.message;
-
-        return [{ path, message }];
+        errors = err.errors;
       } else {
-        return null;
+        let handler = null;
+
+        for (let handlerCandidate of _this3.handlers) {
+          let handlerOptions = handlerCandidate.options || {};
+
+          if (!( // name
+          handlerCandidate.error === err.name || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error)) {
+            continue;
+          }
+
+          if (!( // code
+          typeof handlerOptions.code === 'undefined' || typeof handlerOptions.code !== 'undefined' && handlerOptions.code === err.code)) {
+            continue;
+          }
+
+          if (!( // block
+          typeof handlerOptions.block === 'undefined' || typeof handlerOptions.block !== 'undefined' && (yield handlerOptions.block(err, _this3.context)))) {
+            continue;
+          }
+
+          handler = handlerCandidate;
+          break;
+        }
+
+        if (handler) {
+          var _handler = handler;
+          let path = _handler.path;
+          let message = _handler.message;
+          let error = _handler.error;
+
+          errors = [{ path, message, kind: error }];
+        }
+      }
+
+      if (errors.length > 0) {
+        return errors;
+      } else if (emptyFn) {
+        return emptyFn(err, _this3.context);
+      } else {
+        return undefined;
       }
     })();
   }
 }
-exports.Approval = Approval;
+exports.Schema = Schema;

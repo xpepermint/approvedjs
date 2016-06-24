@@ -1,49 +1,48 @@
-const {Approval, ValidationError} = require('..');
+const {Schema, ValidationError} = require('..');
 
-let approval = new Approval();
-
-describe('filterInput', () => {
+describe('filter', () => {
 
   it('filters input', async () => {
-    expect(await approval.filterInput({
+    let schema = new Schema({
       name: ' John  Smith  ',
       email: 'john@smith.com'
-    }, [{
+    });
+    schema.addFilter({
       path: 'name',
       type: 'string',
       modifiers: ['squish']
-    }])).toEqual({
-      name: 'John Smith'
-    })
+    });
+    await schema.filter();
+    expect(schema.data).toEqual({name: 'John Smith'})
   });
 
   it('filters nested input', async () => {
-    expect(await approval.filterInput({
+    let schema = new Schema({
       user: {
         name: ' John  Smith  ',
         email: 'john@smith.com'
       }
-    }, [{
+    });
+    schema.addFilter({
       path: 'user.name',
       type: 'string',
       modifiers: ['squish']
-    }])).toEqual({
-      user: {
-        name: 'John Smith'
-      }
-    })
+    });
+    await schema.filter();
+    expect(schema.data).toEqual({user: {name: 'John Smith'}})
   });
 
   it('filters input with block function', async () => {
-    expect(await approval.filterInput({
+    let schema = new Schema({
       name: 'John'
-    }, [{
+    });
+    schema.addFilter({
       path: 'name',
       type: 'string',
       block: async (s) => `**${s}**`
-    }])).toEqual({
-      name: '**John**'
-    })
+    });
+    await schema.filter();
+    expect(schema.data).toEqual({name: '**John**'})
   });
 
 });
@@ -51,12 +50,14 @@ describe('filterInput', () => {
 describe('validateInput', () => {
 
   it('validates invalid input', async () => {
+    let schema = new Schema();
+    schema.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
     try {
-      await approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
+      await schema.validate();
       expect(true).toEqual(false);
     } catch(err) {
       expect(err instanceof ValidationError).toEqual(true);
@@ -64,12 +65,14 @@ describe('validateInput', () => {
   });
 
   it('validates invalid nested input', async () => {
+    let schema = new Schema();
+    schema.addValidation({
+      path: 'user.name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
     try {
-      await approval.validateInput({}, [{
-        path: 'user.name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
+      await schema.validate();
       expect(true).toEqual(false);
     } catch(err) {
       expect(err instanceof ValidationError).toEqual(true);
@@ -81,33 +84,43 @@ describe('validateInput', () => {
 describe('handleError', () => {
 
   it('handles validation error', async () => {
+    let schema = new Schema();
+    schema.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
     try {
-      await approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
+      await schema.validate();
       expect(true).toEqual(false);
     } catch(err) {
       expect(
-        await approval.handleError(err)
-      ).toEqual([
-        {path: 'name', message: 'must be present'}
-      ]);
+        await schema.handle(err)
+      ).toEqual([{
+        path: 'name',
+        message: 'must be present',
+        kind: 'ValidationError'
+      }]);
     }
   });
 
   it('handles custom error', async () => {
+    let schema = new Schema();
+    schema.addHandler({
+      path: 'system',
+      error: 'Error',
+      message: 'fake error'
+    });
     try {
       throw new Error('something went wrong');
     } catch(err) {
-      expect(await approval.handleError(err, [{
+      expect(
+        await schema.handle(err)
+      ).toEqual([{
         path: 'system',
-        error: 'Error',
-        message: 'fake error'
-      }])).toEqual([
-        {path: 'system', message: 'fake error'}
-      ]);
+        message: 'fake error',
+        kind: 'Error'
+      }]);
     }
   });
 

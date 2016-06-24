@@ -4,48 +4,47 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 var _require = require('..');
 
-const Approval = _require.Approval;
+const Schema = _require.Schema;
 const ValidationError = _require.ValidationError;
 
 
-let approval = new Approval();
-
-describe('filterInput', () => {
+describe('filter', () => {
 
   it('filters input', _asyncToGenerator(function* () {
-    expect((yield approval.filterInput({
+    let schema = new Schema({
       name: ' John  Smith  ',
       email: 'john@smith.com'
-    }, [{
+    });
+    schema.addFilter({
       path: 'name',
       type: 'string',
       modifiers: ['squish']
-    }]))).toEqual({
-      name: 'John Smith'
     });
+    yield schema.filter();
+    expect(schema.data).toEqual({ name: 'John Smith' });
   }));
 
   it('filters nested input', _asyncToGenerator(function* () {
-    expect((yield approval.filterInput({
+    let schema = new Schema({
       user: {
         name: ' John  Smith  ',
         email: 'john@smith.com'
       }
-    }, [{
+    });
+    schema.addFilter({
       path: 'user.name',
       type: 'string',
       modifiers: ['squish']
-    }]))).toEqual({
-      user: {
-        name: 'John Smith'
-      }
     });
+    yield schema.filter();
+    expect(schema.data).toEqual({ user: { name: 'John Smith' } });
   }));
 
   it('filters input with block function', _asyncToGenerator(function* () {
-    expect((yield approval.filterInput({
+    let schema = new Schema({
       name: 'John'
-    }, [{
+    });
+    schema.addFilter({
       path: 'name',
       type: 'string',
       block: (() => {
@@ -57,21 +56,23 @@ describe('filterInput', () => {
           return ref.apply(this, arguments);
         };
       })()
-    }]))).toEqual({
-      name: '**John**'
     });
+    yield schema.filter();
+    expect(schema.data).toEqual({ name: '**John**' });
   }));
 });
 
 describe('validateInput', () => {
 
   it('validates invalid input', _asyncToGenerator(function* () {
+    let schema = new Schema();
+    schema.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
     try {
-      yield approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
+      yield schema.validate();
       expect(true).toEqual(false);
     } catch (err) {
       expect(err instanceof ValidationError).toEqual(true);
@@ -79,12 +80,14 @@ describe('validateInput', () => {
   }));
 
   it('validates invalid nested input', _asyncToGenerator(function* () {
+    let schema = new Schema();
+    schema.addValidation({
+      path: 'user.name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
     try {
-      yield approval.validateInput({}, [{
-        path: 'user.name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
+      yield schema.validate();
       expect(true).toEqual(false);
     } catch (err) {
       expect(err instanceof ValidationError).toEqual(true);
@@ -95,27 +98,39 @@ describe('validateInput', () => {
 describe('handleError', () => {
 
   it('handles validation error', _asyncToGenerator(function* () {
+    let schema = new Schema();
+    schema.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
     try {
-      yield approval.validateInput({}, [{
-        path: 'name',
-        validator: 'isPresent',
-        message: 'must be present'
-      }]);
+      yield schema.validate();
       expect(true).toEqual(false);
     } catch (err) {
-      expect((yield approval.handleError(err))).toEqual([{ path: 'name', message: 'must be present' }]);
+      expect((yield schema.handle(err))).toEqual([{
+        path: 'name',
+        message: 'must be present',
+        kind: 'ValidationError'
+      }]);
     }
   }));
 
   it('handles custom error', _asyncToGenerator(function* () {
+    let schema = new Schema();
+    schema.addHandler({
+      path: 'system',
+      error: 'Error',
+      message: 'fake error'
+    });
     try {
       throw new Error('something went wrong');
     } catch (err) {
-      expect((yield approval.handleError(err, [{
+      expect((yield schema.handle(err))).toEqual([{
         path: 'system',
-        error: 'Error',
-        message: 'fake error'
-      }]))).toEqual([{ path: 'system', message: 'fake error' }]);
+        message: 'fake error',
+        kind: 'Error'
+      }]);
     }
   }));
 });

@@ -1,17 +1,25 @@
-exports.filters = [
-  {
-    path: 'name',
-    type: 'string',
-    modifiers: ['squish', 'toLowerCase']
-  }
-];
+import {Schema} from '../../src';
 
-exports.validations = [
-  {
-    path: 'name',
-    validator: 'isPresent',
-    message: 'must be present'
-  }
-];
+export class User extends Schema {
 
-exports.handlers = [];
+  constructor(input, context) {
+    super(input, context);
+
+    this.addFilter({
+      path: 'name',
+      type: 'string',
+      modifiers: ['squish', 'toLowerCase']
+    });
+
+    this.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+  }
+
+  async save() {
+    return 'Pretend that data have been saved :).'
+  }
+
+};
