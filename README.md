@@ -1,6 +1,9 @@
 # New API Proposal
 
-## Defining Approval v1
+## Defining Approval v1 (no)
+
+**WHY NOT?**: Exposing objects like this is cool but not a safe way. You are
+forced to define filters on the class.
 
 ```js
 exports.User = class extends Schema {
@@ -36,7 +39,9 @@ exports.User = class extends Schema {
 };
 ```
 
-## Defining Approval v2
+## Defining Approval v2 (no)
+
+**WHY NOT?**: Exposing objects like this is cool but not a safe way.
 
 ```js
 exports.User = class extends Schema {
@@ -76,7 +81,10 @@ exports.User = class extends Schema {
 };
 ```
 
-## Defining Approval v3
+## Defining Approval v3 (no)
+
+**WHY NOT?**: Not the right way beacuse a method have more then 3 arguments. It's
+also not aesthetic.
 
 ```js
 import {Schema} from 'approved';
@@ -99,7 +107,9 @@ export class extends Schema {
 };
 ```
 
-## Defining Approval v4 (preferred)
+## Defining Approval v4 (yes)
+
+Schema can be extended and used as a model class.
 
 ```js
 import {Schema} from 'approved';
@@ -135,7 +145,38 @@ export class extends Schema {
 };
 ```
 
-## Usage v1 (preferred)
+We can use it without extending the class.
+
+```js
+import {Schema} from 'approved';
+
+let schema = new Schema({
+  name: 'John Smith',
+  email: 'john@smith.com'
+});
+
+schema.addFilter({
+  path: 'name',
+  type: 'string',
+  modifiers: ['squish', 'toLowerCase']
+});
+
+schema.addValidation({
+  path: 'name',
+  validator: 'isPresent',
+  message: 'must be present'
+});
+
+schema.addHandler({
+  path: 'system',
+  error: 'Error',
+  options {code: 500, block: async (value) => true},
+  message: 'something went wrong'
+});
+
+```
+
+## Usage v1 (yes)
 
 ```js
 import {User} from 'approvals/user';
@@ -149,15 +190,16 @@ const user = new User({
 // validating and executing a custom method
 let data, errors = null
 try {
-  await user.validate();
-  data = await user.save();
+  await user.filter(); // not required (don't have to be inside try/catch block)
+  await user.validate(); // not required
+  data = await user.save(); // executing a custom method
 } catch(err) {
-  errors = await user.handle(err, (err) => null)); // return null on unhandled error
+  errors = await user.handle(err, (err) => null)); // return [] on unhandled error (default is null)
   if (!errors) throw err;
 }
 ```
 
-## Response v1 (preferred)
+## Response v1 (yes)
 
 ```js
 {
