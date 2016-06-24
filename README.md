@@ -152,7 +152,8 @@ try {
   await user.validate();
   data = await user.save();
 } catch(err) {
-  errors = await user.handle(err);
+  errors = await user.handle(err, (err) => null)); // return null on unhandled error
+  if (!errors) throw err;
 }
 ```
 
@@ -160,10 +161,18 @@ try {
 
 ```js
 {
-  data: null
+  data: null,
   errors: [
-    {path: 'name', message: 'must be present', kind: 'ValidationError'},
-    {path: 'system', message: 'something went wrong', kind: 'Error'}
+    {
+      path: 'name',
+      message: 'must be present',
+      kind: 'ValidationError'
+    },
+    {
+      path: 'system',
+      message: 'something went wrong',
+      kind: 'Error'
+    }
   ]
 }
 ```
