@@ -533,15 +533,15 @@ Handler object defines how an error is handled by the `handle` method.
 |-----|------|----------|------------
 | path | String | Yes | The output key name or a key name of an input object to which the error refers to.
 | error | Object | Yes | Error class instance.
-| options | Object | No | Handler options. You can set the `code` and `block` keys to additionally check if the handler applies to the provided error.
+| block | Function | No | Helper function to additionally check if the handler applies to the provided error.
 | message | String | Yes | Output error message explaining what went wrong.
 
 ```js
 let handler = {
-  path: 'system',
+  path: 'request',
   error: 'Error',
-  options {code: 500, block: async (value) => true},
-  message: 'something went wrong'
+  block: async (err) => err.code === 400,
+  message: 'bad request'
 };
 ```
 
