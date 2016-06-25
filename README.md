@@ -30,9 +30,9 @@ Continue reading to see how this package is supposed to be used.
 
 ## Usage
 
-Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we will filter and validate an input and then create a new document in a database. If something will go wrong, an error will be handled and parsed into a user-friendly format.
+Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we filter and validate an input and then create a new document in a database. If something goes wrong, an error is handled and parsed into a user-friendly format.
 
-To make things as clean as possible, we'll use [Babel](https://babeljs.io/) with ES7 features and thus we will be able to wrap our code into the `async` block.
+To make things as clean as possible, we use [Babel](https://babeljs.io/) with ES7 features thus we can wrap our code into the `async` block.
 
 ```js
 (async function() {
@@ -40,7 +40,7 @@ To make things as clean as possible, we'll use [Babel](https://babeljs.io/) with
 })().catch(console.error);
 ```
 
-For the purpose of this tutorial let's first define an imaginary input object which we will validate and save to the database.
+For the purpose of this tutorial let's first define an imaginary input object which we will later validate and save to the database.
 
 ```js
 const input = {
@@ -70,7 +70,7 @@ schema.addFilter({
 await schema.filter();
 ```
 
-We first define a filter and then call the `filter` method to extract, cast and modify the input object. After the `filter` method call the `schema.data` holds only the email field.
+We define a filter and then call the `filter` method to extract, cast and modify the input object. After the `filter` method call the `schema.data` holds only the email field.
 
 Let's continue by adding validations. We need to verify the email before we store it to the database.
 
@@ -88,7 +88,7 @@ try {
 }
 ```
 
-Similar to filters, we first add validations and then execture the `validate` method to verify previously filtered input object. If validation fails the method throws the `ValidationError`. Let's update the try/catch block above by adding the error handling logic.
+Similar to filters, we first add the validation, then we execute the `validate` method to verify previously filtered input object. If validation fails the method throws the `ValidationError`. Let's update the try/catch block above by adding the error handling logic.
 
 ```js
 let errors = null;
@@ -100,7 +100,7 @@ try {
 }
 ```
 
-To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) for storing data, with a unique index on the `email` field, named `uniqueEmail`. This will trigger the `E11000` error when the code is executed for the second time. How to use the MongoDB driver and how to [create a unique indexe](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure that yourself.
+To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) to store data, with a unique index on the `email` field, named `uniqueEmail`. This triggers the `E11000` error when the code is executed for the second time. How to use the MongoDB driver and how to [create a unique indexe](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure that yourself.
 
 ```js
 import {MongoClient} from 'mongodb';
@@ -108,7 +108,7 @@ import {MongoClient} from 'mongodb';
 const mongo = await MongoClient.connect('mongodb://localhost:27017/approved');
 ```
 
-The `handle` method handles the `ValidationError` by default. To handle the `MongoError`, we need to define a handler. Here we also use the [mongo-error-parser](https://github.com/xpepermint/mongo-error-parser) helper for parsing MongoError message (don't forget to install it).
+The `handle` method handles the `ValidationError` by default. To handle a `MongoError`, we need to define a handler. Note that we also use the [mongo-error-parser](https://github.com/xpepermint/mongo-error-parser) helper for parsing MongoError message (don't forget to install it).
 
 ```js
 import mongoParser from 'mongo-error-parser';
@@ -134,13 +134,13 @@ try {
 }
 ```
 
-That's it. We can now show a well structured data object.
+That's it. We can now show a well structured data object to a user.
 
 ```js
 console.log({data, errors});
 ```
 
-Note that it's a good practice to extend the Schema class and place it into a separated file inside the `./approvals` directory. See the included example (`npm run example`) and the source code for more.
+Note that it's a good practice to extend the Schema class, add configuration in the constructor and place it into a separated file inside the `./approvals` directory. See the included example (`npm run example`) and the source code for more.
 
 ## API
 
@@ -152,10 +152,10 @@ import {Schema} from 'approved';
 const schema = new Schema(input, context);
 ```
 
-| Param | Type | Required | Description
-|-------|------|----------|------------
-| input | Object | Yes | Input data object.
-| context | Object | No | Context object which is passed into each filter, validation and handler.
+| Param | Type | Required | Default | Description
+|-------|------|----------|---------|------------
+| input | Object | Yes | - | Input data object.
+| context | Object | No | - | Context object which is passed into each filter, validation and handler.
 
 ### Instance Variables
 
