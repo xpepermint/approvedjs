@@ -221,7 +221,7 @@ export class Schema {
       let value = dottie.get(this.data, path, null);
       let isValid = await validator(value, validation.options||{}, this.context);
       if (!isValid) {
-        errors.push({path, message, kind: 'ValidationError'});
+        errors.push({path, message});
       }
     }
 
@@ -236,26 +236,24 @@ export class Schema {
     let errors = [];
 
     if (err instanceof ValidationError) {
-      errors = err.errors;
+      errors = Array.from(err.errors).map(({path, message}) => {
+        let kind = err.name;
+        let code = err.code;
+        return {path, message, kind, code};
+      });
+
     } else {
       let handler = null;
 
       for (let handlerCandidate of this.handlers) {
-        let handlerOptions = handlerCandidate.options || {};
-
         if (!( // name
           handlerCandidate.error === err.name
           || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error
         )) { continue }
 
-        if (!( // code
-          typeof handlerOptions.code === 'undefined'
-          || typeof handlerOptions.code !== 'undefined' && handlerOptions.code === err.code
-        )) { continue }
-
         if (!( // block
-          typeof handlerOptions.block === 'undefined'
-          || typeof handlerOptions.block !== 'undefined' && await handlerOptions.block(err, this.context)
+          typeof handlerCandidate.block === 'undefined'
+          || typeof handlerCandidate.block !== 'undefined' && await handlerCandidate.block(err, this.context)
         )) { continue }
 
         handler = handlerCandidate;
@@ -263,8 +261,10 @@ export class Schema {
       }
 
       if (handler) {
-        let {path, message, error} = handler;
-        errors = [{path, message, kind: error}];
+        let {path, message} = handler;
+        let kind = err.name;
+        let code = err.code || 500;
+        errors = [{path, message, kind, code}];
       }
     }
 

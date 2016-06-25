@@ -99,7 +99,8 @@ describe('handleError', () => {
       ).toEqual([{
         path: 'name',
         message: 'must be present',
-        kind: 'ValidationError'
+        kind: 'ValidationError',
+        code: 422
       }]);
     }
   });
@@ -109,6 +110,7 @@ describe('handleError', () => {
     schema.addHandler({
       path: 'system',
       error: 'Error',
+      block: (err) => err.message === 'something went wrong',
       message: 'fake error'
     });
     try {
@@ -119,7 +121,8 @@ describe('handleError', () => {
       ).toEqual([{
         path: 'system',
         message: 'fake error',
-        kind: 'Error'
+        kind: 'Error',
+        code: 500
       }]);
     }
   });

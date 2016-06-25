@@ -260,7 +260,7 @@ class Schema {
         let value = _dottie2.default.get(_this2.data, path, null);
         let isValid = yield validator(value, validation.options || {}, _this2.context);
         if (!isValid) {
-          errors.push({ path, message, kind: 'ValidationError' });
+          errors.push({ path, message });
         }
       }
 
@@ -279,25 +279,25 @@ class Schema {
       let errors = [];
 
       if (err instanceof ValidationError) {
-        errors = err.errors;
+        errors = Array.from(err.errors).map(function (_ref2) {
+          let path = _ref2.path;
+          let message = _ref2.message;
+
+          let kind = err.name;
+          let code = err.code;
+          return { path, message, kind, code };
+        });
       } else {
         let handler = null;
 
         for (let handlerCandidate of _this3.handlers) {
-          let handlerOptions = handlerCandidate.options || {};
-
           if (!( // name
           handlerCandidate.error === err.name || typeof handlerCandidate.error === 'object' && err instanceof handlerCandidate.error)) {
             continue;
           }
 
-          if (!( // code
-          typeof handlerOptions.code === 'undefined' || typeof handlerOptions.code !== 'undefined' && handlerOptions.code === err.code)) {
-            continue;
-          }
-
           if (!( // block
-          typeof handlerOptions.block === 'undefined' || typeof handlerOptions.block !== 'undefined' && (yield handlerOptions.block(err, _this3.context)))) {
+          typeof handlerCandidate.block === 'undefined' || typeof handlerCandidate.block !== 'undefined' && (yield handlerCandidate.block(err, _this3.context)))) {
             continue;
           }
 
@@ -309,9 +309,10 @@ class Schema {
           var _handler = handler;
           let path = _handler.path;
           let message = _handler.message;
-          let error = _handler.error;
 
-          errors = [{ path, message, kind: error }];
+          let kind = err.name;
+          let code = err.code || 500;
+          errors = [{ path, message, kind, code }];
         }
       }
 

@@ -114,10 +114,7 @@ import mongoParser from 'mongo-error-parser';
 schema.addHandler({
   path: 'email',
   error: 'MongoError',
-  options: {
-    code: 11000,
-    block: async (err) => mongoParser(err).index === 'uniqueEmail'
-  },
+  block: async (err) => err.code === 11000 && mongoParser(err).index === 'uniqueEmail',
   message: 'is already taken'
 });
 ```
