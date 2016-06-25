@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Schema-based data filtering, validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
@@ -31,8 +31,12 @@
     "framework"
   ],
   "jest": {
-    "testPathDirs": ["dist"],
-    "unmockedModulePathPatterns": ["./"],
+    "testPathDirs": [
+      "dist"
+    ],
+    "unmockedModulePathPatterns": [
+      "./"
+    ],
     "collectCoverage": false
   },
   "author": "xpepermint (Kristijan Sedlak)",
@@ -49,7 +53,7 @@
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-preset-node5": "^11.1.0",
-    "jest-cli": "^12.1.1",
+    "jest-cli": "^13.0.0",
     "koa": "^2.0.0",
     "koa-bodyparser": "^3.1.0"
   }
