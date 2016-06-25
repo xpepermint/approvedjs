@@ -2,7 +2,7 @@
 
 > Schema-based data filtering, validation and error handling.
 
-Approved.js allows for filtering and validating complex javascript objects and error handling. It has a simple, unified and beautiful API with a support for asynchronous processing.
+Approved.js allows for filtering and validating complex javascript objects and error handling. It has a simple, unified and beautiful API which fully supports asynchronous processing.
 
 It is an open source package. The [source code](https://github.com/xpepermint/approvedjs) is available on GitHub where you can also find our [issue tracker](https://github.com/xpepermint/approvedjs/issues).
 
