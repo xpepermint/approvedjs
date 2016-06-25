@@ -12,32 +12,30 @@ describe('filter', () => {
 
   it('filters input', _asyncToGenerator(function* () {
     let schema = new Schema({
-      name: ' John  Smith  ',
+      name: 1000,
       email: 'john@smith.com'
     });
     schema.addFilter({
       path: 'name',
-      type: 'string',
-      modifiers: ['squish']
+      type: 'string'
     });
     yield schema.filter();
-    expect(schema.data).toEqual({ name: 'John Smith' });
+    expect(schema.data).toEqual({ name: '1000' });
   }));
 
   it('filters nested input', _asyncToGenerator(function* () {
     let schema = new Schema({
       user: {
-        name: ' John  Smith  ',
+        name: 1000,
         email: 'john@smith.com'
       }
     });
     schema.addFilter({
       path: 'user.name',
-      type: 'string',
-      modifiers: ['squish']
+      type: 'string'
     });
     yield schema.filter();
-    expect(schema.data).toEqual({ user: { name: 'John Smith' } });
+    expect(schema.data).toEqual({ user: { name: '1000' } });
   }));
 
   it('filters input with block function', _asyncToGenerator(function* () {

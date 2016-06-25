@@ -20,7 +20,6 @@ export class Schema {
 
     this._data = Object.assign({}, input);
     this._types = {};
-    this._modifiers = {};
     this._validators = {};
     this._filters = [];
     this._validations = [];
@@ -31,10 +30,6 @@ export class Schema {
     this.setType('float', require('./types/float'));
     this.setType('integer', require('./types/integer'));
     this.setType('string', require('./types/string'));
-
-    this.setModifier('squish', require('./modifiers/squish'));
-    this.setModifier('toLowerCase', require('./modifiers/toLowerCase'));
-    this.setModifier('toUpperCase', require('./modifiers/toUpperCase'));
 
     this.setValidator('contains', require('./validators/contains'));
     this.setValidator('isAbsent', require('./validators/isAbsent'));
@@ -76,10 +71,6 @@ export class Schema {
     return this._types;
   }
 
-  get modifiers() {
-    return this._modifiers;
-  }
-
   get validators() {
     return this._validators;
   }
@@ -102,12 +93,6 @@ export class Schema {
     return this;
   }
 
-  setModifier(name, fn) {
-    this._modifiers[name] = fn;
-
-    return this;
-  }
-
   setValidator(name, fn) {
     this._validators[name] = fn;
 
@@ -116,12 +101,6 @@ export class Schema {
 
   unsetType(name) {
     delete this._types[name];
-
-    return this;
-  }
-
-  unsetModifier(name) {
-    delete this._modifiers[name];
 
     return this;
   }
@@ -173,7 +152,6 @@ export class Schema {
 
     for (let filter of this.filters) {
       let {path, type, block} = filter;
-      let modifierNames = filter.modifiers || [];
 
       let typecast = this.types[type];
       if (!typecast) {
@@ -183,15 +161,6 @@ export class Schema {
       let value = typecast(dottie.get(this._input, path, null), this.context);
       if (typeof value === 'undefined') {
         continue;
-      }
-
-      for (let modifierName of modifierNames) {
-        let modifier = this.modifiers[modifierName];
-        if (!modifier) {
-          throw new Error(`Unknown modifier ${modifierName}`);
-        }
-
-        value = await modifier(value, this.context);
       }
 
       if (block) {

@@ -58,13 +58,12 @@ import {Schema} from 'approved';
 let schema = new Schema(input);
 ```
 
-Optionally we can filter input data and extract only the paths defined by filters.
+Optionally we can filter input data and extract only the paths defined by filters. Filters also cast the input to the right data type.
 
 ```js
 schema.addFilter({
   path: 'email',
-  type: 'string',
-  modifiers: ['squish', 'toLowerCase']
+  type: 'string'
 });
 
 await schema.filter();
@@ -175,10 +174,6 @@ const schema = new Schema(input, context);
 
 > Holds a list of defined error handlers.
 
-#### schema.modifiers
-
-> Holds a list of defined data modifiers.
-
 #### schema.types
 
 > Holds a list of defined data types.
@@ -233,15 +228,6 @@ const schema = new Schema(input, context);
 
 > Removes a validation from the list of validations.
 
-#### schema.setModifier(name, fn)
-
-> Registers a data modifier helper.
-
-| Param | Type | Required | Description
-|-------|------|----------|------------
-| name | String | Yes | Type name.
-| fn | Function | Yes | Type cast method.
-
 #### schema.setType(name, fn)
 
 > Registers a data type method.
@@ -259,14 +245,6 @@ const schema = new Schema(input, context);
 |-------|------|----------|------------
 | name | String | Yes | Validator name.
 | fn | Function | Yes | Validator method.
-
-#### schema.unsetModifier(name)
-
-> Unregisters a data modifier helper.
-
-| Param | Type | Required | Description
-|-------|------|----------|------------
-| name | String | Yes | Modifier name.
 
 #### schema.unsetType(name)
 
@@ -296,33 +274,15 @@ Filter object defines how a value of an input object key is casted and filtered 
 |-----|------|----------|------------
 | path | String | Yes | Key name of an input object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
 | type | String | Yes | Data type name (possible values are `boolean`, `date`, `float`, `integer` or `string`).
-| modifiers | Array | No | List of modifiers.
-| block | Function | No | Synchronous or asynchronous resolver (e.g. `async (s) => s`)
+| block | Function | No | Synchronous or asynchronous resolver for modifying key value (e.g. `async (s) => s`).
 
 ```js
 const filter = {
-  path: 'name',
+  path: 'email',
   type: 'string',
-  modifiers: ['squish'],
-  block: (s, o) => s
+  block: (s, o) => s.toLowerCase()
 };
 ```
-
-#### Modifiers
-
-Modifiers transform a value and are used by filters.
-
-##### squish
-
-> Removes white-spaces on both ends of the string and changes remaining consecutive whitespace groups into one space each.
-
-##### toLowerCase
-
-> Converts characters in the string to lowercase.
-
-##### toUpperCase
-
-> Converts characters in the string to uppercase.
 
 ### Validations
 
@@ -549,7 +509,7 @@ let handler = {
 
 ## Advanced Usage
 
-You can customize how this module behaves by extending the Schema class or by just defining your custom types, modifiers and validators (check the source code for more).
+You can customize how this module behaves by extending the Schema class or by defining your custom types and validators (check the source code for more).
 
 ### Custom Type
 
@@ -559,18 +519,6 @@ Use the `setType` method to define a custom data type.
 let schema = new Schema();
 
 schema.setType('cooltype', (value, context) => {
-  return `cool-${value}`; // not a very smart example :)
-});
-```
-
-### Custom Modifier
-
-Use the `setModifier` method to define a custom data modifier.
-
-```js
-let schema = new Schema();
-
-schema.setModifier('coolerize', (value, context) => {
   return `cool-${value}`; // not a very smart example :)
 });
 ```

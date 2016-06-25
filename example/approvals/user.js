@@ -1,3 +1,4 @@
+import S from 'string';
 import {Schema} from '../../src';
 
 export class User extends Schema {
@@ -8,7 +9,7 @@ export class User extends Schema {
     this.addFilter({
       path: 'name',
       type: 'string',
-      modifiers: ['squish', 'toLowerCase']
+      block: (v) => S(v).stripPunctuation().stripLeft().stripRight().s
     });
 
     this.addValidation({

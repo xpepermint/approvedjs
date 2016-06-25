@@ -41,7 +41,6 @@ class Schema {
 
     this._data = Object.assign({}, input);
     this._types = {};
-    this._modifiers = {};
     this._validators = {};
     this._filters = [];
     this._validations = [];
@@ -52,10 +51,6 @@ class Schema {
     this.setType('float', require('./types/float'));
     this.setType('integer', require('./types/integer'));
     this.setType('string', require('./types/string'));
-
-    this.setModifier('squish', require('./modifiers/squish'));
-    this.setModifier('toLowerCase', require('./modifiers/toLowerCase'));
-    this.setModifier('toUpperCase', require('./modifiers/toUpperCase'));
 
     this.setValidator('contains', require('./validators/contains'));
     this.setValidator('isAbsent', require('./validators/isAbsent'));
@@ -97,10 +92,6 @@ class Schema {
     return this._types;
   }
 
-  get modifiers() {
-    return this._modifiers;
-  }
-
   get validators() {
     return this._validators;
   }
@@ -123,12 +114,6 @@ class Schema {
     return this;
   }
 
-  setModifier(name, fn) {
-    this._modifiers[name] = fn;
-
-    return this;
-  }
-
   setValidator(name, fn) {
     this._validators[name] = fn;
 
@@ -137,12 +122,6 @@ class Schema {
 
   unsetType(name) {
     delete this._types[name];
-
-    return this;
-  }
-
-  unsetModifier(name) {
-    delete this._modifiers[name];
 
     return this;
   }
@@ -206,7 +185,6 @@ class Schema {
         let type = filter.type;
         let block = filter.block;
 
-        let modifierNames = filter.modifiers || [];
 
         let typecast = _this.types[type];
         if (!typecast) {
@@ -216,15 +194,6 @@ class Schema {
         let value = typecast(_dottie2.default.get(_this._input, path, null), _this.context);
         if (typeof value === 'undefined') {
           continue;
-        }
-
-        for (let modifierName of modifierNames) {
-          let modifier = _this.modifiers[modifierName];
-          if (!modifier) {
-            throw new Error(`Unknown modifier ${ modifierName }`);
-          }
-
-          value = yield modifier(value, _this.context);
         }
 
         if (block) {
