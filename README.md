@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/xpepermint/approvedjs.svg?branch=master)&nbsp;[![NPM version](https://badge.fury.io/js/approved.svg)](http://badge.fury.io/js/approved)&nbsp;[![Dependency Status](https://gemnasium.com/xpepermint/approvedjs.svg)](https://gemnasium.com/xpepermint/approvedjs)
+![Build Status](https://travis-ci.org/xpepermint/approvedjs.svg?branch=master)&nbsp;[![NPM Version](https://badge.fury.io/js/approved.svg)](https://badge.fury.io/js/approved)&nbsp;[![Dependency Status](https://gemnasium.com/xpepermint/approvedjs.svg)](https://gemnasium.com/xpepermint/approvedjs)
 
 # approved.js
 
