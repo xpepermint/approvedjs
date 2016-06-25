@@ -533,7 +533,7 @@ Handler object defines how an error is handled by the `handle` method.
 |-----|------|----------|------------
 | path | String | Yes | The output key name or a key name of an input object to which the error refers to.
 | error | Object | Yes | Error class instance.
-| block | Function | No | Helper function to additionally check if the handler applies to the provided error.
+| block | Function | No | Synchronous or asynchronous helper to additionally check if the handler applies to the provided error.
 | message | String | Yes | Output error message explaining what went wrong.
 
 ```js
