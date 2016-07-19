@@ -94,8 +94,8 @@ let errors = null;
 try {
   await schema.validate();
 } catch(e) {
-  errors = await schema.handle(err);
-  if (!errors) throw err; // unhandled error
+  errors = await schema.handle(e);
+  if (!errors) throw e; // unhandled error
 }
 ```
 
@@ -128,8 +128,8 @@ try {
   await schema.validate();
   data = await mongo.collection('users').insertOne(schema.data);
 } catch(e) {
-  errors = await schema.handle(err);
-  if (!errors) throw err; // unhandled error
+  errors = await schema.handle(e);
+  if (!errors) throw e; // unhandled error
 }
 ```
 
