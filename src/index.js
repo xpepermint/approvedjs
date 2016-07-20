@@ -202,7 +202,7 @@ export class Schema {
   }
 
   async handle(err) {
-    let errors = [];
+    let errors = null;
 
     if (err instanceof ValidationError) {
       errors = Array.from(err.errors).map(({path, message}) => {
