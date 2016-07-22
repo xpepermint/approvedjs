@@ -96,7 +96,7 @@ describe('filter', () => {
 
 describe('validateInput', () => {
 
-  it('validates invalid data', _asyncToGenerator(function* () {
+  it('validates invalid common types', _asyncToGenerator(function* () {
     let approval = new Approval();
     approval.addValidation({
       path: 'name',
@@ -122,6 +122,25 @@ describe('validateInput', () => {
 
     try {
       yield approval.validate();
+      expect(true).toEqual(false);
+    } catch (err) {
+      expect(err instanceof ValidationError).toEqual(true);
+    }
+  }));
+
+  it('validates invalid arrays', _asyncToGenerator(function* () {
+    let data = {
+      emails: ['a@a.com', null]
+    };
+    let approval = new Approval();
+    approval.addValidation({
+      path: 'emails',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+
+    try {
+      yield approval.validate(data);
       expect(true).toEqual(false);
     } catch (err) {
       expect(err instanceof ValidationError).toEqual(true);

@@ -247,7 +247,14 @@ class Approval {
         }
 
         let value = _dottie2.default.get(data, path, null);
-        let isValid = yield validator(value, validation.options || {}, context);
+        let isValid = false;
+        if (Array.isArray(value)) {
+          isValid = value.map(function (v) {
+            return validator(v, validation.options || {}, context);
+          }).indexOf(false) === -1;
+        } else {
+          isValid = validator(value, validation.options || {}, context);
+        }
         if (!isValid) {
           errors.push({ path, message });
         }

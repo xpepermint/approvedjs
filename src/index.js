@@ -190,7 +190,12 @@ export class Approval {
       }
 
       let value = dottie.get(data, path, null);
-      let isValid = await validator(value, validation.options||{}, context);
+      let isValid = false;
+      if (Array.isArray(value)) {
+        isValid = value.map(v => validator(v, validation.options||{}, context)).indexOf(false) === -1;
+      } else {
+        isValid = validator(value, validation.options||{}, context);
+      }
       if (!isValid) {
         errors.push({path, message});
       }

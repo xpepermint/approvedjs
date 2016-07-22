@@ -81,7 +81,7 @@ describe('filter', () => {
 
 describe('validateInput', () => {
 
-  it('validates invalid data', async () => {
+  it('validates invalid common types', async () => {
     let approval = new Approval();
     approval.addValidation({
       path: 'name',
@@ -108,6 +108,26 @@ describe('validateInput', () => {
 
     try {
       await approval.validate();
+      expect(true).toEqual(false);
+    } 
+    catch(err) {
+      expect(err instanceof ValidationError).toEqual(true);
+    }
+  });
+
+  it('validates invalid arrays', async () => {
+    let data = {
+      emails: ['a@a.com', null]
+    };
+    let approval = new Approval();
+    approval.addValidation({
+      path: 'emails',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+
+    try {
+      await approval.validate(data);
       expect(true).toEqual(false);
     } 
     catch(err) {
