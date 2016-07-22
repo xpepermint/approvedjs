@@ -14,7 +14,7 @@ export class ValidationError extends ExtendableError {
 
 export class Approval {
 
-  constructor({filters, validations, handlers, types, validators}) {
+  constructor({filters=[], validations=[], handlers=[], types={}, validators={}}={}) {
     this._types = {};
     this._validators = {};
     this._filters = filters;
@@ -144,7 +144,7 @@ export class Approval {
   }
 
   async filter(data, context={}, {strict=true}={}) {
-    if (!data) return data;
+    if (!data) data = {};
 
     let output = strict ? {} : Object.assign({}, data);
 
@@ -172,7 +172,7 @@ export class Approval {
   }
 
   async validate(data, context={}) {
-    if (!data) return data;
+    if (!data) data = {};
 
     let errors = [];
 

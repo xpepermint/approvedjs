@@ -1,128 +1,153 @@
 const {Approval, ValidationError} = require('..');
 
-// describe('filter', () => {
+describe('filter', () => {
 
-//   it('filters input', async () => {
-//     let schema = new Schema({
-//       name: 1000,
-//       email: 'john@smith.com'
-//     });
-//     schema.addFilter({
-//       path: 'name',
-//       type: 'string'
-//     });
-//     await schema.filter();
-//     expect(schema.data).toEqual({name: '1000'})
-//   });
+  it('filters data', async () => {
+    let data = {
+      name: 1000,
+      email: 'john@smith.com'
+    };
 
-//   it('filters nested input', async () => {
-//     let schema = new Schema({
-//       user: {
-//         name: 1000,
-//         email: 'john@smith.com'
-//       }
-//     });
-//     schema.addFilter({
-//       path: 'user.name',
-//       type: 'string'
-//     });
-//     await schema.filter();
-//     expect(schema.data).toEqual({user: {name: '1000'}})
-//   });
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'name',
+      type: 'string'
+    });
 
-//   it('filters input with block function', async () => {
-//     let schema = new Schema({
-//       name: 'John'
-//     });
-//     schema.addFilter({
-//       path: 'name',
-//       type: 'string',
-//       block: async (s) => `**${s}**`
-//     });
-//     await schema.filter();
-//     expect(schema.data).toEqual({name: '**John**'})
-//   });
+    let output = await approval.filter(data);
+    expect(output).toEqual({
+      name: '1000'
+    });
+  });
 
-// });
+  it('filters nested data', async () => {
+    let data = {
+      user: {
+        name: 1000,
+        email: 'john@smith.com'
+      }
+    };
 
-// describe('validateInput', () => {
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'user.name',
+      type: 'string'
+    });
 
-//   it('validates invalid input', async () => {
-//     let schema = new Schema();
-//     schema.addValidation({
-//       path: 'name',
-//       validator: 'isPresent',
-//       message: 'must be present'
-//     });
-//     try {
-//       await schema.validate();
-//       expect(true).toEqual(false);
-//     } catch(err) {
-//       expect(err instanceof ValidationError).toEqual(true);
-//     }
-//   });
+    let output = await approval.filter(data);
+    expect(output).toEqual({
+      user: {
+        name: '1000'
+      }
+    });
+  });
 
-//   it('validates invalid nested input', async () => {
-//     let schema = new Schema();
-//     schema.addValidation({
-//       path: 'user.name',
-//       validator: 'isPresent',
-//       message: 'must be present'
-//     });
-//     try {
-//       await schema.validate();
-//       expect(true).toEqual(false);
-//     } catch(err) {
-//       expect(err instanceof ValidationError).toEqual(true);
-//     }
-//   });
+  it('filters data with block function', async () => {
+    let data = {
+      name: 'John'
+    };
 
-// });
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'name',
+      type: 'string',
+      block: async (s) => `**${s}**`
+    });
 
-// describe('handleError', () => {
+    let output = await approval.filter(data);
+    expect(output).toEqual({
+      name: '**John**'
+    });
+  });
 
-//   it('handles validation error', async () => {
-//     let schema = new Schema();
-//     schema.addValidation({
-//       path: 'name',
-//       validator: 'isPresent',
-//       message: 'must be present'
-//     });
-//     try {
-//       await schema.validate();
-//       expect(true).toEqual(false);
-//     } catch(err) {
-//       expect(
-//         await schema.handle(err)
-//       ).toEqual([{
-//         path: 'name',
-//         message: 'must be present',
-//         kind: 'ValidationError',
-//         code: 422
-//       }]);
-//     }
-//   });
+});
 
-//   it('handles custom error', async () => {
-//     let schema = new Schema();
-//     schema.addHandler({
-//       path: 'system',
-//       error: 'Error',
-//       block: (err) => err.message === 'something went wrong',
-//       message: 'fake error'
-//     });
-//     try {
-//       throw new Error('something went wrong');
-//     } catch(err) {
-//       expect(
-//         await schema.handle(err)
-//       ).toEqual([{
-//         path: 'system',
-//         message: 'fake error',
-//         kind: 'Error',
-//         code: 500
-//       }]);
-//     }
-//   });
+describe('validateInput', () => {
 
-// });
+  it('validates invalid data', async () => {
+    let approval = new Approval();
+    approval.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+
+    try {
+      await approval.validate();
+      expect(true).toEqual(false);
+    } 
+    catch(err) {
+      expect(err instanceof ValidationError).toEqual(true);
+    }
+  });
+
+  it('validates invalid nested data', async () => {
+    let approval = new Approval();
+    approval.addValidation({
+      path: 'user.name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+
+    try {
+      await approval.validate();
+      expect(true).toEqual(false);
+    } 
+    catch(err) {
+      expect(err instanceof ValidationError).toEqual(true);
+    }
+  });
+
+});
+
+describe('handleError', () => {
+
+  it('handles validation error', async () => {
+    let approval = new Approval();
+    approval.addValidation({
+      path: 'name',
+      validator: 'isPresent',
+      message: 'must be present'
+    });
+
+    try {
+      await approval.validate();
+      expect(true).toEqual(false);
+    } 
+    catch(err) {
+      expect(
+        await approval.handle(err)
+      ).toEqual([{
+        path: 'name',
+        message: 'must be present',
+        kind: 'ValidationError',
+        code: 422
+      }]);
+    }
+  });
+
+  it('handles custom error', async () => {
+    let approval = new Approval();
+    approval.addHandler({
+      path: 'system',
+      error: 'Error',
+      block: (err) => err.message === 'something went wrong',
+      message: 'fake error'
+    });
+
+    try {
+      throw new Error('something went wrong');
+    } 
+    catch(err) {
+      expect(
+        await approval.handle(err)
+      ).toEqual([{
+        path: 'system',
+        message: 'fake error',
+        kind: 'Error',
+        code: 500
+      }]);
+    }
+  });
+
+});

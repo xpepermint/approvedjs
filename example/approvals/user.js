@@ -2,12 +2,12 @@ import S from 'string';
 import {Approval} from '../../src';
 
 export const approval = new Approval({
-  types: {
-    'coolType': (value, context) => {}
-  },
-  validators: {
-    'isCool': (value, context) => str === 'cool'
-  },
+  // types: {
+  //   'coolType': (value, context) => {}
+  // },
+  // validators: {
+  //   'isCool': (value, context) => str === 'cool'
+  // },
   filters: [
     {
       path: 'name', 

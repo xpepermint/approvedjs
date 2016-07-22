@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Schema = exports.ValidationError = undefined;
+exports.Approval = exports.ValidationError = undefined;
 
 var _es6Error = require('es6-error');
 
@@ -31,26 +31,37 @@ class ValidationError extends _es6Error2.default {
 }
 
 exports.ValidationError = ValidationError;
-class Schema {
+class Approval {
 
-  constructor(input) {
-    let context = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  constructor() {
+    var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    this._input = input || {};
-    this._context = context;
+    var _ref$filters = _ref.filters;
+    let filters = _ref$filters === undefined ? [] : _ref$filters;
+    var _ref$validations = _ref.validations;
+    let validations = _ref$validations === undefined ? [] : _ref$validations;
+    var _ref$handlers = _ref.handlers;
+    let handlers = _ref$handlers === undefined ? [] : _ref$handlers;
+    var _ref$types = _ref.types;
+    let types = _ref$types === undefined ? {} : _ref$types;
+    var _ref$validators = _ref.validators;
+    let validators = _ref$validators === undefined ? {} : _ref$validators;
 
-    this._data = Object.assign({}, input);
     this._types = {};
     this._validators = {};
-    this._filters = [];
-    this._validations = [];
-    this._handlers = [];
+    this._filters = filters;
+    this._validations = validations;
+    this._handlers = handlers;
 
     this.setType('boolean', require('./types/boolean'));
     this.setType('date', require('./types/date'));
     this.setType('float', require('./types/float'));
     this.setType('integer', require('./types/integer'));
     this.setType('string', require('./types/string'));
+
+    for (let type in types) {
+      this.setType(type, types[type]);
+    }
 
     this.setValidator('contains', require('./validators/contains'));
     this.setValidator('isAbsent', require('./validators/isAbsent'));
@@ -78,14 +89,10 @@ class Schema {
     this.setValidator('isUUID', require('./validators/isUUID'));
     this.setValidator('isValid', require('./validators/isValid'));
     this.setValidator('matches', require('./validators/matches'));
-  }
 
-  get data() {
-    return this._data;
-  }
-
-  get context() {
-    return this._context;
+    for (let validator in validators) {
+      this.setValidator(validator, validators[validator]);
+    }
   }
 
   get types() {
@@ -168,17 +175,21 @@ class Schema {
     return this;
   }
 
-  filter() {
-    var _this = this,
-        _arguments = arguments;
+  filter(data) {
+    var _arguments = arguments,
+        _this = this;
 
     return _asyncToGenerator(function* () {
-      var _ref = _arguments.length <= 0 || _arguments[0] === undefined ? {} : _arguments[0];
+      let context = _arguments.length <= 1 || _arguments[1] === undefined ? {} : _arguments[1];
 
-      var _ref$strict = _ref.strict;
-      let strict = _ref$strict === undefined ? true : _ref$strict;
+      var _ref2 = _arguments.length <= 2 || _arguments[2] === undefined ? {} : _arguments[2];
 
-      let data = strict ? {} : Object.assign({}, _this._data);
+      var _ref2$strict = _ref2.strict;
+      let strict = _ref2$strict === undefined ? true : _ref2$strict;
+
+      if (!data) data = {};
+
+      let output = strict ? {} : Object.assign({}, data);
 
       for (let filter of _this.filters) {
         let path = filter.path;
@@ -191,28 +202,31 @@ class Schema {
           throw new Error(`Unknown type ${ type }`);
         }
 
-        let value = typecast(_dottie2.default.get(_this._input, path, null), _this.context);
+        let value = typecast(_dottie2.default.get(data, path, null), context);
         if (typeof value === 'undefined') {
           continue;
         }
 
         if (block) {
-          value = yield block(value, _this.context);
+          value = yield block(value, context);
         }
 
-        data[path] = value;
+        output[path] = value;
       }
 
-      _this._data = _dottie2.default.transform(data);
-
-      return _this;
+      return _dottie2.default.transform(output);
     })();
   }
 
-  validate() {
-    var _this2 = this;
+  validate(data) {
+    var _arguments2 = arguments,
+        _this2 = this;
 
     return _asyncToGenerator(function* () {
+      let context = _arguments2.length <= 1 || _arguments2[1] === undefined ? {} : _arguments2[1];
+
+      if (!data) data = {};
+
       let errors = [];
 
       for (let validation of _this2.validations) {
@@ -226,8 +240,8 @@ class Schema {
           throw new Error(`Unknown validator ${ validatorName }`);
         }
 
-        let value = _dottie2.default.get(_this2.data, path, null);
-        let isValid = yield validator(value, validation.options || {}, _this2.context);
+        let value = _dottie2.default.get(data, path, null);
+        let isValid = yield validator(value, validation.options || {}, context);
         if (!isValid) {
           errors.push({ path, message });
         }
@@ -236,21 +250,24 @@ class Schema {
       if (errors.length > 0) {
         throw new ValidationError(errors);
       } else {
-        return _this2;
+        return data;
       }
     })();
   }
 
   handle(err) {
-    var _this3 = this;
+    var _arguments3 = arguments,
+        _this3 = this;
 
     return _asyncToGenerator(function* () {
+      let context = _arguments3.length <= 1 || _arguments3[1] === undefined ? {} : _arguments3[1];
+
       let errors = null;
 
       if (err instanceof ValidationError) {
-        errors = Array.from(err.errors).map(function (_ref2) {
-          let path = _ref2.path;
-          let message = _ref2.message;
+        errors = Array.from(err.errors).map(function (_ref3) {
+          let path = _ref3.path;
+          let message = _ref3.message;
 
           let kind = err.name;
           let code = err.code;
@@ -266,7 +283,7 @@ class Schema {
           }
 
           if (!( // block
-          typeof handlerCandidate.block === 'undefined' || typeof handlerCandidate.block !== 'undefined' && (yield handlerCandidate.block(err, _this3.context)))) {
+          typeof handlerCandidate.block === 'undefined' || typeof handlerCandidate.block !== 'undefined' && (yield handlerCandidate.block(err, context)))) {
             continue;
           }
 
@@ -289,4 +306,4 @@ class Schema {
     })();
   }
 }
-exports.Schema = Schema;
+exports.Approval = Approval;
