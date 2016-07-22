@@ -201,7 +201,7 @@ const schema = new Approval(config);
 |-------|------|----------|---------|------------
 | data | Object | Yes | - | A data object.
 | context | Object | No | {} | A context object which is passed into filters.
-| strict | Boolean | No | Yes | Removes data object keys which are not defined by the filters when `true`.
+| strict | Boolean | No | false | Removes data object keys which are not defined by the filters when `true`.
 
 #### schema.handle(error, context);
 

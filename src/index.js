@@ -143,7 +143,7 @@ export class Approval {
     return this;
   }
 
-  async filter(data, context={}, {strict=true}={}) {
+  async filter(data, context={}, {strict=false}={}) {
     if (!data) data = {};
 
     let output = strict ? {} : Object.assign({}, data);
