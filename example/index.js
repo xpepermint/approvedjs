@@ -1,6 +1,6 @@
-import {User} from './approvals/user';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
+import {approval} from './approvals/user';
 
 // creating application
 const app = new Koa();
@@ -8,24 +8,34 @@ app.use(bodyParser());
 
 // handling requests
 app.use(async (ctx) => {
-  let user = new User(ctx.request.body);
-  let data, errors, status = null
+  let data = ctx.request.body;
+  let errors, status = null;
+
   try {
-    await user.filter();
-    await user.validate();
-    data = await user.save();
+    // filter data
+    data = await approval.filter(data, ctx);
+    // validate data
+    await approval.validate(data, ctx);
+    // data can be saved to DB
     status = 200;
-  } catch(err) {
-    errors = await user.handle(err);
+  } 
+  catch(err) {
+    // wrap errors into user-friendly format
+    errors = await approval.handle(err, ctx);
+    // remember error status code
     if (errors) {
       status = err.code;
-    } else {
+    } 
+    // handle unknown errors
+    else {
       throw err;
     }
   }
+
+  // show data/errors to a user
   ctx.status = status;
   ctx.body = {data, errors};
 });
 
 // server started
-app.listen(3000, () => console.log('Server is listening on port 3000 ...'));
+app.listen(3000, () => console.log('Listening on port 3000 ...'));

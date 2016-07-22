@@ -245,7 +245,7 @@ class Schema {
     var _this3 = this;
 
     return _asyncToGenerator(function* () {
-      let errors = [];
+      let errors = null;
 
       if (err instanceof ValidationError) {
         errors = Array.from(err.errors).map(function (_ref2) {

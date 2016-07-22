@@ -12,24 +12,24 @@ export class ValidationError extends ExtendableError {
 
 }
 
-export class Schema {
+export class Approval {
 
-  constructor(input, context={}) {
-    this._input = input || {};
-    this._context = context;
-
-    this._data = Object.assign({}, input);
+  constructor({filters, validations, handlers, types, validators}) {
     this._types = {};
     this._validators = {};
-    this._filters = [];
-    this._validations = [];
-    this._handlers = [];
+    this._filters = filters;
+    this._validations = validations;
+    this._handlers = handlers;
 
     this.setType('boolean', require('./types/boolean'));
     this.setType('date', require('./types/date'));
     this.setType('float', require('./types/float'));
     this.setType('integer', require('./types/integer'));
     this.setType('string', require('./types/string'));
+
+    for (let type in types) {
+      this.setType(type, types[type]);
+    }
 
     this.setValidator('contains', require('./validators/contains'));
     this.setValidator('isAbsent', require('./validators/isAbsent'));
@@ -57,14 +57,10 @@ export class Schema {
     this.setValidator('isUUID', require('./validators/isUUID'));
     this.setValidator('isValid', require('./validators/isValid'));
     this.setValidator('matches', require('./validators/matches'));
-  }
 
-  get data() {
-    return this._data;
-  }
-
-  get context() {
-    return this._context;
+    for (let validator in validators) {
+      this.setValidator(validator, validators[validator]);
+    }
   }
 
   get types() {
@@ -147,8 +143,10 @@ export class Schema {
     return this;
   }
 
-  async filter({strict=true}={}) {
-    let data = strict ? {} : Object.assign({}, this._data);
+  async filter(data, context={}, {strict=true}={}) {
+    if (!data) return data;
+
+    let output = strict ? {} : Object.assign({}, data);
 
     for (let filter of this.filters) {
       let {path, type, block} = filter;
@@ -158,24 +156,24 @@ export class Schema {
         throw new Error(`Unknown type ${type}`);
       }
 
-      let value = typecast(dottie.get(this._input, path, null), this.context);
+      let value = typecast(dottie.get(data, path, null), context);
       if (typeof value === 'undefined') {
         continue;
       }
 
       if (block) {
-        value = await block(value, this.context);
+        value = await block(value, context);
       }
 
-      data[path] = value;
+      output[path] = value;
     }
 
-    this._data = dottie.transform(data);
-
-    return this;
+    return dottie.transform(output);
   }
 
-  async validate() {
+  async validate(data, context={}) {
+    if (!data) return data;
+
     let errors = [];
 
     for (let validation of this.validations) {
@@ -187,8 +185,8 @@ export class Schema {
         throw new Error(`Unknown validator ${validatorName}`);
       }
 
-      let value = dottie.get(this.data, path, null);
-      let isValid = await validator(value, validation.options||{}, this.context);
+      let value = dottie.get(data, path, null);
+      let isValid = await validator(value, validation.options||{}, context);
       if (!isValid) {
         errors.push({path, message});
       }
@@ -197,11 +195,11 @@ export class Schema {
     if (errors.length > 0) {
       throw new ValidationError(errors);
     } else {
-      return this;
+      return data;
     }
   }
 
-  async handle(err) {
+  async handle(err, context={}) {
     let errors = null;
 
     if (err instanceof ValidationError) {
@@ -222,7 +220,7 @@ export class Schema {
 
         if (!( // block
           typeof handlerCandidate.block === 'undefined'
-          || typeof handlerCandidate.block !== 'undefined' && await handlerCandidate.block(err, this.context)
+          || typeof handlerCandidate.block !== 'undefined' && await handlerCandidate.block(err, context)
         )) { continue }
 
         handler = handlerCandidate;
