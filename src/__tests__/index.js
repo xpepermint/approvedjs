@@ -14,7 +14,7 @@ describe('filter', () => {
       type: 'string'
     });
 
-    let output = await approval.filter(data);
+    let output = await approval.filter(data, null, {strict: true});
     expect(output).toEqual({
       name: '1000'
     });
@@ -34,7 +34,7 @@ describe('filter', () => {
       type: 'string'
     });
 
-    let output = await approval.filter(data);
+    let output = await approval.filter(data, null, {strict: true});
     expect(output).toEqual({
       user: {
         name: '1000'

@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Schema-based data filtering, validation and error handling.",
   "main": "dist/index.js",
   "scripts": {

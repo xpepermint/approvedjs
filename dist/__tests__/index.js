@@ -22,7 +22,7 @@ describe('filter', () => {
       type: 'string'
     });
 
-    let output = yield approval.filter(data);
+    let output = yield approval.filter(data, null, { strict: true });
     expect(output).toEqual({
       name: '1000'
     });
@@ -42,7 +42,7 @@ describe('filter', () => {
       type: 'string'
     });
 
-    let output = yield approval.filter(data);
+    let output = yield approval.filter(data, null, { strict: true });
     expect(output).toEqual({
       user: {
         name: '1000'

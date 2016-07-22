@@ -185,7 +185,7 @@ class Approval {
       var _ref2 = _arguments.length <= 2 || _arguments[2] === undefined ? {} : _arguments[2];
 
       var _ref2$strict = _ref2.strict;
-      let strict = _ref2$strict === undefined ? true : _ref2$strict;
+      let strict = _ref2$strict === undefined ? false : _ref2$strict;
 
       if (!data) data = {};
 
