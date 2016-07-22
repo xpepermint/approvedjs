@@ -10,7 +10,7 @@ const ValidationError = _require.ValidationError;
 
 describe('filter', () => {
 
-  it('filters data', _asyncToGenerator(function* () {
+  it('filters common types', _asyncToGenerator(function* () {
     let data = {
       name: 1000,
       email: 'john@smith.com'
@@ -47,6 +47,23 @@ describe('filter', () => {
       user: {
         name: '1000'
       }
+    });
+  }));
+
+  it('filters array types', _asyncToGenerator(function* () {
+    let data = {
+      ids: [100, 200]
+    };
+
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'ids',
+      type: 'string'
+    });
+
+    let output = yield approval.filter(data);
+    expect(output).toEqual({
+      ids: ['100', '200']
     });
   }));
 

@@ -2,7 +2,7 @@ const {Approval, ValidationError} = require('..');
 
 describe('filter', () => {
 
-  it('filters data', async () => {
+  it('filters common types', async () => {
     let data = {
       name: 1000,
       email: 'john@smith.com'
@@ -39,6 +39,23 @@ describe('filter', () => {
       user: {
         name: '1000'
       }
+    });
+  });
+
+  it('filters array types', async () => {
+    let data = {
+      ids: [100, 200]
+    };
+
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'ids',
+      type: 'string'
+    });
+
+    let output = await approval.filter(data);
+    expect(output).toEqual({
+      ids: ['100', '200']
     });
   });
 

@@ -202,9 +202,15 @@ class Approval {
           throw new Error(`Unknown type ${ type }`);
         }
 
-        let value = typecast(_dottie2.default.get(data, path, null), context);
+        let value = _dottie2.default.get(data, path, null);
         if (typeof value === 'undefined') {
           continue;
+        } else if (Array.isArray(value)) {
+          value = value.map(function (v) {
+            return typecast(v, context);
+          });
+        } else {
+          value = typecast(_dottie2.default.get(data, path, null), context);
         }
 
         if (block) {

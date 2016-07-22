@@ -1,6 +1,6 @@
 {
   "name": "approved",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Schema-based data filtering, validation and error handling.",
   "main": "dist/index.js",
   "scripts": {
@@ -36,8 +36,7 @@
     ],
     "unmockedModulePathPatterns": [
       "./"
-    ],
-    "collectCoverage": false
+    ]
   },
   "author": "xpepermint (Kristijan Sedlak)",
   "license": "MIT",

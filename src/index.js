@@ -156,9 +156,13 @@ export class Approval {
         throw new Error(`Unknown type ${type}`);
       }
 
-      let value = typecast(dottie.get(data, path, null), context);
+      let value = dottie.get(data, path, null);
       if (typeof value === 'undefined') {
         continue;
+      } else if (Array.isArray(value)) {
+        value = value.map(v => typecast(v, context));
+      } else {
+        value = typecast(dottie.get(data, path, null), context);
       }
 
       if (block) {
