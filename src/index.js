@@ -166,7 +166,13 @@ export class Approval {
       }
 
       if (block) {
-        value = await block(value, context);
+        if (Array.isArray(value)) {
+          for (let i in value) {
+            value[i] = await block(value[i], context);
+          }
+        } else {
+          value = await block(value, context);
+        }
       }
 
       output[path] = value;

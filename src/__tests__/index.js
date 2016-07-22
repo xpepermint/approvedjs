@@ -59,7 +59,7 @@ describe('filter', () => {
     });
   });
 
-  it('filters data with block function', async () => {
+  it('filters common types with block function', async () => {
     let data = {
       name: 'John'
     };
@@ -74,6 +74,24 @@ describe('filter', () => {
     let output = await approval.filter(data);
     expect(output).toEqual({
       name: '**John**'
+    });
+  });
+
+  it('filters array with block function', async () => {
+    let data = {
+      name: ['John', 'Mandy']
+    };
+
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'name',
+      type: 'string',
+      block: async (s) => `**${s}**`
+    });
+
+    let output = await approval.filter(data);
+    expect(output).toEqual({
+      name: ['**John**', '**Mandy**']
     });
   });
 

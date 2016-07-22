@@ -214,7 +214,13 @@ class Approval {
         }
 
         if (block) {
-          value = yield block(value, context);
+          if (Array.isArray(value)) {
+            for (let i in value) {
+              value[i] = yield block(value[i], context);
+            }
+          } else {
+            value = yield block(value, context);
+          }
         }
 
         output[path] = value;

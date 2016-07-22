@@ -67,7 +67,7 @@ describe('filter', () => {
     });
   }));
 
-  it('filters data with block function', _asyncToGenerator(function* () {
+  it('filters common types with block function', _asyncToGenerator(function* () {
     let data = {
       name: 'John'
     };
@@ -90,6 +90,32 @@ describe('filter', () => {
     let output = yield approval.filter(data);
     expect(output).toEqual({
       name: '**John**'
+    });
+  }));
+
+  it('filters array with block function', _asyncToGenerator(function* () {
+    let data = {
+      name: ['John', 'Mandy']
+    };
+
+    let approval = new Approval();
+    approval.addFilter({
+      path: 'name',
+      type: 'string',
+      block: (() => {
+        var ref = _asyncToGenerator(function* (s) {
+          return `**${ s }**`;
+        });
+
+        return function block(_x2) {
+          return ref.apply(this, arguments);
+        };
+      })()
+    });
+
+    let output = yield approval.filter(data);
+    expect(output).toEqual({
+      name: ['**John**', '**Mandy**']
     });
   }));
 });
