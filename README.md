@@ -12,11 +12,11 @@ It is an open source package. The [source code](https://github.com/xpepermint/ap
 
 ## Motivation
 
-We often write code which validates input data and handles errors. We do it when we write API controllers, GraphQL mutations, before we try to write something into a database and in many other cases where we manipulate and mutate data.
+We often write code which validates data and handles errors. We do it when we write API controllers, GraphQL mutations, before we try to write something into a database and in many other cases where we manipulate and mutate data.
 
 Every time you start writing validations, you ask yourself the same questions. You try hard finding the best way to get a clean and beautiful solution. At the end you desperately start googling for answers, searching best practices and possible conventions.
 
-We need to write a clean and beautiful code to keep our projects long-term sustainable. Validation happens before actual action and error handling happens afterwords. That's why validation and error handling go hand in hand. Approved.js has been written with that in mind.
+We need to write a clean and beautiful code to keep our projects long-term sustainable. Validation happens before actual action and error handling happens afterwords - validation and error handling go hand in hand. Approved.js has been written with that in mind.
 
 ## Installation
 
@@ -30,7 +30,7 @@ Continue reading to see how this package is supposed to be used.
 
 ## Usage
 
-Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we filter and validate an input and then create a new document in a database. If something goes wrong, an error is handled and parsed into a user-friendly format.
+Below, we create a simple example to show the benefit of using Approved.js in your Node.js projects. In this tutorial we filter and validate data and then create a new document in a database. If something goes wrong, an error is handled and parsed into a user-friendly format.
 
 To make things as clean as possible, we use [Babel](https://babeljs.io/) with ES7 features thus we can wrap our code into the `async` block.
 
@@ -40,25 +40,25 @@ To make things as clean as possible, we use [Babel](https://babeljs.io/) with ES
 })().catch(console.error);
 ```
 
-For the purpose of this tutorial let's first define an imaginary input object which we will later validate and save to the database.
+For the purpose of this tutorial let's first define an imaginary `data` object which we will later validate and save to the database.
 
 ```js
-const input = {
+const data = {
   firstName: 'John',
   lastName: 'Smith',
   email: 'John@Smith.com'
 }
 ```
 
-Next, let's create a simple schema for the input data above.
+Next, let's create a simple schema for the data above.
 
 ```js
-import {Schema} from 'approved';
+import {Approval} from 'approved';
 
-let schema = new Schema(input);
+let schema = new Approval();
 ```
 
-Optionally we can filter input data and extract only the paths defined by filters. Filters also cast the input to the right data type.
+We can filter `data` and extract only the paths defined by filters. Filters also cast data to the right data type.
 
 ```js
 schema.addFilter({
@@ -66,10 +66,10 @@ schema.addFilter({
   type: 'string'
 });
 
-await schema.filter();
+data = await schema.filter(data); // check the API for method options
 ```
 
-We define a filter and then call the `filter` method to extract, cast and modify the input object. After the `filter` method call the `schema.data` holds only the email field.
+We define a filter and then we call the `filter` method to extract, cast and modify the data object.
 
 Let's continue by adding validations. We need to verify the email before we store it to the database.
 
@@ -81,25 +81,27 @@ schema.addValidation({
 });
 
 try {
-  await schema.validate();
+  await schema.validate(data); // check the API for method options
 } catch(e) {
   // validation failed
 }
 ```
 
-Similar to filters, we first add the validation, then we execute the `validate` method to verify previously filtered input object. If validation fails the method throws the `ValidationError`. Let's update the try/catch block above by adding the error handling logic.
+Similar to filters, we first add the validation, then we execute the `validate` method to verify the `data` object. If validation fails the method throws a `ValidationError`. 
+
+Let's update the try/catch block above with an error handler.
 
 ```js
 let errors = null;
 try {
   await schema.validate();
 } catch(e) {
-  errors = await schema.handle(e);
+  errors = await schema.handle(e); // check the API for method options
   if (!errors) throw e; // unhandled error
 }
 ```
 
-To show the real benefit of this package let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) to store data, with a unique index on the `email` field, named `uniqueEmail`. This triggers the `E11000` error when the code is executed for the second time. How to use the MongoDB driver and how to [create a unique indexe](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure that yourself.
+To show the real benefit of the `handle` method let's use the [MongoDB driver](https://docs.mongodb.com/ecosystem/drivers/node-js/) to store `data`, with a unique index on the `email` field, named `uniqueEmail`. This triggers the `E11000` error when the code is executed for the second time. How to use the MongoDB driver and how to [create a unique index](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/) is out of scope for this tutorial and you'll have to figure that yourself.
 
 ```js
 import {MongoClient} from 'mongodb';
@@ -107,7 +109,7 @@ import {MongoClient} from 'mongodb';
 const mongo = await MongoClient.connect('mongodb://localhost:27017/approved');
 ```
 
-The `handle` method handles the `ValidationError` by default. To handle a `MongoError`, we need to define a handler. Note that we also use the [mongo-error-parser](https://github.com/xpepermint/mongo-error-parser) helper for parsing MongoError message (don't forget to install it).
+The `handle` method handles the `ValidationError` by default. To handle a `MongoError`, we need to define a handler. Here we also use the [mongo-error-parser](https://github.com/xpepermint/mongo-error-parser) helper for parsing MongoError message (don't forget to install it).
 
 ```js
 import mongoParser from 'mongo-error-parser';
@@ -120,13 +122,13 @@ schema.addHandler({
 });
 ```
 
-We can now update the try/catch block defined earlier with a logic for storing input data to the database.
+We can now update the try/catch block defined earlier with the logic for storing data to the database.
 
 ```js
-let errors, data = null;
+let errors = null;
 try {
-  await schema.validate();
-  data = await mongo.collection('users').insertOne(schema.data);
+  await schema.validate(data);
+  data = await mongo.collection('users').insertOne(data);
 } catch(e) {
   errors = await schema.handle(e);
   if (!errors) throw e; // unhandled error
@@ -136,35 +138,26 @@ try {
 That's it. We can now show a well structured data object to a user.
 
 ```js
-console.log({data, errors});
+console.log({data, errors}); // cool for GraphQL
 ```
 
-Note that it's a good practice to extend the Schema class, add configuration in the constructor and place it into a separated file inside the `./approvals` directory. See the included example (`npm run example`) and the source code for more.
+Note that it's a good practice to store schema classes into the `./approvals` directory. See the included example (`npm run example`) and the source code for more.
 
 ## API
 
-The core of this package represents the `Schema` class.
+The core of this package represents the `Approval` class.
 
 ```js
-import {Schema} from 'approved';
+import {Approval} from 'approved';
 
-const schema = new Schema(input, context);
+const schema = new Approval(config);
 ```
 
 | Param | Type | Required | Default | Description
 |-------|------|----------|---------|------------
-| input | Object | Yes | - | Input data object.
-| context | Object | No | - | Context object which is passed into each filter, validation and handler.
+| config | Object | No | - | A configuration object accepting keys `types={}`, `validators={}`, `filters=[]`, `validations=[]` and `handlers=[]`.
 
 ### Instance Variables
-
-#### schema.context
-
-> Holds a context object.
-
-#### schema.data
-
-> Holds an input data object.
 
 #### schema.filters
 
@@ -200,21 +193,24 @@ const schema = new Schema(input, context);
 
 > Adds a validation to the list of validations.
 
-#### schema.filter({strict});
+#### schema.filter(data, context, {strict});
 
-> Filters an input object against the filters provided by the `addFilter` method.
+> Filters a data object against the filters provided by the `addFilter` method.
 
 | Param | Type | Required | Default | Description
 |-------|------|----------|---------|------------
-| strict | Boolean | No | Yes | Removes input object keys which are not defined by the filters when `true`.
+| data | Object | Yes | - | A data object.
+| context | Object | No | {} | A context object which is passed into filters.
+| strict | Boolean | No | Yes | Removes data object keys which are not defined by the filters when `true`.
 
-#### schema.handle(error);
+#### schema.handle(error, context);
 
 > Handles the provided Error object based on the provided handlers.
 
 | Param | Type | Required | Description
 |-------|------|----------|------------
 | error | Object | Yes | Error class instance or an error object.
+| context | Object | No | {} | A context object which is passed into handlers.
 
 #### schema.removeFilterAtIndex(index)
 
@@ -262,17 +258,22 @@ const schema = new Schema(input, context);
 |-------|------|----------|------------
 | name | String | Yes | Validator name.
 
-#### schema.validate();
+#### schema.validate(data, context);
+
+| Param | Type | Required | Default | Description
+|-------|------|----------|---------|------------
+| data | Object | Yes | - | A data object.
+| context | Object | No | {} | A context object which is passed into validators.
 
 > Validates the data object against the validations provided by the `addValidation` method. It throws a `ValidationError` if an object is not valid.
 
 ### Filters
 
-Filter object defines how a value of an input object key is casted and filtered by the `filter` method.
+Filter object defines how a value of an data object key is casted and filtered by the `filter` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
-| path | String | Yes | Key name of an input object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
+| path | String | Yes | Key name of a data object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
 | type | String | Yes | Data type name (possible values are `boolean`, `date`, `float`, `integer` or `string`).
 | block | Function | No | Synchronous or asynchronous resolver for modifying key value (e.g. `async (s) => s`).
 
@@ -286,11 +287,11 @@ const filter = {
 
 ### Validations
 
-Validation object defines how a value of an input object key is validated by the `validate` method.
+Validation object defines how a value of a data object key is validated by the `validate` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
-| path | String | Yes | Key name of an input object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
+| path | String | Yes | Key name of a data object (e.g. firstName). Nested object paths are also supported (e.g. `users.name.first`)
 | validator | String | Yes | Validator name (see the `Built-in Validators` section for a list of available names).
 | options | Object | No | Validator settings.
 | message | String | Yes | Output error message explaining what went wrong.
@@ -493,7 +494,7 @@ Handler object defines how an error is handled by the `handle` method.
 
 | Key | Type | Required | Description
 |-----|------|----------|------------
-| path | String | Yes | The output key name or a key name of an input object to which the error refers to.
+| path | String | Yes | The output key name or a key name of a data object to which the error refers to.
 | error | Object | Yes | Error class instance.
 | block | Function | No | Synchronous or asynchronous helper to additionally check if the handler applies to the provided error.
 | message | String | Yes | Output error message explaining what went wrong.
