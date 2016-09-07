@@ -1,4 +1,6 @@
-![Build Status](https://travis-ci.org/xpepermint/approvedjs.svg?branch=master)&nbsp;[![NPM Version](https://badge.fury.io/js/approved.svg)](https://badge.fury.io/js/approved)&nbsp;[![Dependency Status](https://gemnasium.com/xpepermint/approvedjs.svg)](https://gemnasium.com/xpepermint/approvedjs)
+**THIS PROJECT IS DEPRECATED**
+
+Approved.js has been merged into a new package called [contextable.js](https://github.com/xpepermint/contextablejs). It's a simple unopinionated and minimalist framework for creating context objects supporting dynamic ORM, object schemas, data filtering, validation and error handling.
 
 # approved.js
 
